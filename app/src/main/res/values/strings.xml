@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SensorMusicPlayer</string>
+    <string name="title_graph">Accelerometer</string>
 </resources>
