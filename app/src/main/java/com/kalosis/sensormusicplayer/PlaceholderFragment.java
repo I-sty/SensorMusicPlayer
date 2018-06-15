@@ -7,14 +7,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jjoe64.graphview.series.DataPoint;
+import com.kalosis.sensormusicplayer.controler.Section;
 import com.kalosis.sensormusicplayer.fragments.FragmentX;
+import com.kalosis.sensormusicplayer.fragments.FragmentXYZ;
 import com.kalosis.sensormusicplayer.fragments.FragmentY;
 import com.kalosis.sensormusicplayer.fragments.FragmentZ;
+
+import static com.kalosis.sensormusicplayer.controler.Section.SECTION_XYZ;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -26,25 +30,14 @@ public class PlaceholderFragment extends Fragment {
    */
   private static final String ARG_SECTION_NUMBER = "section_number";
 
-  private static final byte SECTION_X = 1;
+  private static final String TAG = PlaceholderFragment.class.getName();
 
-  private static final byte SECTION_Y = 2;
-
-  private static final byte SECTION_Z = 3;
+  private static final float THRESHOLD = 0.3f;
 
   @Nullable
   private static SensorEventListener accelerometerEventListener;
 
-  @Nullable
-  private static FragmentX fragmentX;
-
-  @Nullable
-  private static FragmentY fragmentY;
-
-  @Nullable
-  private static FragmentZ fragmentZ;
-
-  private double counter;
+  private final Counter counter = new Counter();
 
   private float[] gravity = new float[3];
 
@@ -70,20 +63,24 @@ public class PlaceholderFragment extends Fragment {
 
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    final int sectionNumber = getArguments() != null ? getArguments().getInt(ARG_SECTION_NUMBER) : SECTION_X;
+    final Section sectionNumber =
+        getArguments() != null ? Section.values()[getArguments().getInt(ARG_SECTION_NUMBER) - 1] : SECTION_XYZ;
     switch (sectionNumber) {
       case SECTION_Y: {
-        fragmentY = new FragmentY();
+        FragmentY fragmentY = new FragmentY();
         return fragmentY.onCreateView(inflater, container, savedInstanceState);
       }
       case SECTION_Z: {
-        fragmentZ = new FragmentZ();
+        FragmentZ fragmentZ = new FragmentZ();
         return fragmentZ.onCreateView(inflater, container, savedInstanceState);
       }
-      default: {
-        //section x
-        fragmentX = new FragmentX();
+      case SECTION_X: {
+        FragmentX fragmentX = new FragmentX();
         return fragmentX.onCreateView(inflater, container, savedInstanceState);
+      }
+      default: {
+        FragmentXYZ fragmentXYZ = new FragmentXYZ();
+        return fragmentXYZ.onCreateView(inflater, container, savedInstanceState);
       }
     }
   }
@@ -97,9 +94,6 @@ public class PlaceholderFragment extends Fragment {
   @Override
   public void onResume() {
     super.onResume();
-    if (fragmentX != null) {
-      counter = fragmentX.getLastX();
-    }
     accelerometerEventListener = new SensorEventListener() {
       @Override
       public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -108,23 +102,33 @@ public class PlaceholderFragment extends Fragment {
 
       @Override
       public void onSensorChanged(SensorEvent event) {
-        // In this example, alpha is calculated as t / (t + dT),
-        // where t is the low-pass filter's time-constant and
-        // dT is the event delivery rate.
+        synchronized (counter) {
+          Log.w(TAG, "[onSensorChanged] counter: " + counter.getCounter());
+          // In this example, alpha is calculated as t / (t + dT),
+          // where t is the low-pass filter's time-constant and
+          // dT is the event delivery rate.
+          final float alpha = 0.8f;
 
-        final float alpha = 0.8f;
+          // Isolate the force of gravity with the low-pass filter.
+          gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+          gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+          gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
-        // Isolate the force of gravity with the low-pass filter.
-        gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
-        gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
-        gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
-
-        // Remove the gravity contribution with the high-pass filter.
-        FragmentX.appendData(new DataPoint(counter, event.values[0] - gravity[0]));
-        FragmentY.appendData(new DataPoint(counter, event.values[1] - gravity[1]));
-        FragmentZ.appendData(new DataPoint(counter, event.values[2] - gravity[2]));
-        ++counter;
+          // Remove the gravity contribution with the high-pass filter.
+          MyDataPoint dataPointX = new MyDataPoint(counter.getCounter(), initYValue(event.values[0] - gravity[0]));
+          FragmentX.appendData(dataPointX);
+          MyDataPoint dataPointY = new MyDataPoint(counter.getCounter(), initYValue(event.values[1] - gravity[1]));
+          FragmentY.appendData(dataPointY);
+          MyDataPoint dataPointZ = new MyDataPoint(counter.getCounter(), initYValue(event.values[2] - gravity[2]));
+          FragmentZ.appendData(dataPointZ);
+          FragmentXYZ.appendData(dataPointX, dataPointY, dataPointZ);
+          counter.increment();
+        }
       }
     };
+  }
+
+  private double initYValue(float v) {
+    return Math.abs(v) < THRESHOLD ? 0f : v;
   }
 }

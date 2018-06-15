@@ -1,5 +1,8 @@
 package com.kalosis.sensormusicplayer;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -10,10 +13,17 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.kalosis.sensormusicplayer.controler.PeakCalculator;
+
 public class MainActivity extends AppCompatActivity {
+
+  private String TAG = MainActivity.class.getName();
+
+  private JobScheduler mJobScheduler;
 
   private Sensor mSensor;
 
@@ -57,6 +67,16 @@ public class MainActivity extends AppCompatActivity {
 
     mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
     tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+    mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+    JobInfo.Builder builder =
+        new JobInfo.Builder(1, new ComponentName(getPackageName(), PeakCalculator.class.getName()));
+    builder.setPeriodic(50);
+    builder.setRequiresCharging(false);
+
+    if (mJobScheduler.schedule(builder.build()) <= 0) {
+      Log.e(TAG, "onCreate: Some error while scheduling the job");
+    }
   }
 
   @Override
@@ -79,4 +99,5 @@ public class MainActivity extends AppCompatActivity {
       }
     }, 1200);
   }
+
 }

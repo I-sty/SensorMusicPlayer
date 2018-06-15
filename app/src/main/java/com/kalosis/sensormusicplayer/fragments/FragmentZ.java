@@ -6,14 +6,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.kalosis.sensormusicplayer.MyDataPoint;
 import com.kalosis.sensormusicplayer.R;
 
 import java.util.ArrayList;
@@ -23,9 +23,9 @@ public class FragmentZ extends GraphFragment {
   private static final String TAG = FragmentZ.class.getName();
 
   @NonNull
-  private static final ArrayList<DataPoint> dataPoints = new ArrayList<>();
+  private static final ArrayList<MyDataPoint> dataPoints = new ArrayList<>();
 
-  private static final LineGraphSeries<DataPoint> series = new LineGraphSeries<>();
+  private static final LineGraphSeries<MyDataPoint> series = new LineGraphSeries<>();
 
   private GraphView graphView;
 
@@ -35,20 +35,16 @@ public class FragmentZ extends GraphFragment {
     @Override
     public void run() {
       synchronized (dataPoints) {
-        try {
-          series.resetData(dataPoints.toArray(new DataPoint[dataPoints.size()]));
+        series.resetData(dataPoints.toArray(new MyDataPoint[dataPoints.size()]));
           graphView.getViewport().setMinX(series.getLowestValueX());
           graphView.getViewport().setMaxX(series.getHighestValueX());
           graphView.getViewport().scrollToEnd();
-        } catch (Exception e) {
-          Log.e(TAG, "[run] exception: " + e);
-        }
         mHandler.postDelayed(this, DELAY_REFRESH);
       }
     }
   };
 
-  public static void appendData(DataPoint dataPoint) {
+  public static void appendData(MyDataPoint dataPoint) {
     if (dataPoint == null) {
       return;
     }
@@ -69,6 +65,7 @@ public class FragmentZ extends GraphFragment {
     View rootView = inflater.inflate(R.layout.fragment_section_z, container, false);
     graphView = rootView.findViewById(R.id.graph_z);
     graphView.addSeries(series);
+    series.setColor(ContextCompat.getColor(inflater.getContext(), R.color.colorAxeZ));
     graphView.getViewport().setXAxisBoundsManual(true);
     graphView.getGridLabelRenderer().setNumHorizontalLabels(5);
     graphView.getGridLabelRenderer().setNumVerticalLabels(5);
