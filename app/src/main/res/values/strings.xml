@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">SensorMusicPlayer</string>
     <string name="title_graph">Accelerometer</string>
+    <string name="tab_text_1">X-axis</string>
+    <string name="tab_text_2">Y-axis</string>
+    <string name="tab_text_3">Z-axis</string>
+    <string name="action_settings">Settings</string>
 </resources>

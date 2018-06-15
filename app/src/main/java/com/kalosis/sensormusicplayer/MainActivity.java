@@ -1,44 +1,82 @@
 package com.kalosis.sensormusicplayer;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
-  @BindView(R.id.graph)
-  GraphView graphView;
+  private Sensor mSensor;
+
+  @Nullable
+  private SensorManager mSensorManager;
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.menu_main, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long
+    // as you specify a parent activity in AndroidManifest.xml.
+    int id = item.getItemId();
+
+    //noinspection SimplifiableIfStatement
+    if (id == R.id.action_settings) {
+      return true;
+    }
+
+    return super.onOptionsItemSelected(item);
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    ButterKnife.bind(this);
-    fillGraphRandomValues();
+
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+    ViewPager mViewPager = findViewById(R.id.container);
+    mViewPager.setAdapter(mSectionsPagerAdapter);
+
+    TabLayout tabLayout = findViewById(R.id.tabs);
+
+    mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+    tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
   }
 
-  /**
-   * Fills the graph with random values
-   */
-  private void fillGraphRandomValues() {
-    Random random = new Random();
-    final int seriesSize = random.nextInt(100) + 1;
-    ArrayList<DataPoint> dataPoints = new ArrayList<>();
-    for (int i = 0; i < seriesSize; i++) {
-      dataPoints.add(new DataPoint(random.nextInt(50), random.nextInt(50)));
+  @Override
+  protected void onPause() {
+    super.onPause();
+    if (mSensorManager != null) {
+      mSensorManager.unregisterListener(PlaceholderFragment.getAccelerometerEventListener());
     }
-    Collections.sort(dataPoints, (o1, o2) -> (int) (o1.getX() - o2.getX()));
-    graphView.setTitle(getString(R.string.title_graph));
-    graphView.addSeries(new LineGraphSeries<>(dataPoints.toArray(new DataPoint[seriesSize])));
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    new Handler().postDelayed(() -> {
+      mSensorManager = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+      if (mSensorManager != null) {
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(PlaceholderFragment.getAccelerometerEventListener(), mSensor,
+            SensorManager.SENSOR_DELAY_NORMAL);
+      }
+    }, 1200);
   }
 }
