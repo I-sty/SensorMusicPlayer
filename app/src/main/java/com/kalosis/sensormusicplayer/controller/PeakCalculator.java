@@ -1,4 +1,4 @@
-package com.kalosis.sensormusicplayer.controler;
+package com.kalosis.sensormusicplayer.controller;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PeakCalculator extends JobService {
 
-  private static final int PEAK_THRESHOLD = 10;
+  private static final int PEAK_THRESHOLD = 7;
 
   private static final String TAG = PeakCalculator.class.getName();
 

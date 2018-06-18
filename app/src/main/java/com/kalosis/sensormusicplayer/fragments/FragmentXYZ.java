@@ -1,14 +1,12 @@
 package com.kalosis.sensormusicplayer.fragments;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +18,10 @@ import com.kalosis.sensormusicplayer.MyDataPoint;
 import com.kalosis.sensormusicplayer.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class FragmentXYZ extends GraphFragment {
-  private static final String TAG = FragmentX.class.getName();
 
   @NonNull
   private static final ArrayList<MyDataPoint> dataPointsX = new ArrayList<>();
@@ -45,19 +43,16 @@ public class FragmentXYZ extends GraphFragment {
   private Handler mHandler;
 
   private Runnable refreshGraph = new Runnable() {
+
     @Override
     public void run() {
       synchronized (dataPointsX) {
-        try {
-          seriesX.resetData(dataPointsX.toArray(new MyDataPoint[dataPointsX.size()]));
-          seriesY.resetData(dataPointsY.toArray(new MyDataPoint[dataPointsY.size()]));
-          seriesZ.resetData(dataPointsZ.toArray(new MyDataPoint[dataPointsZ.size()]));
-          graphView.getViewport().setMinX(seriesX.getLowestValueX());
-          graphView.getViewport().setMaxX(seriesX.getHighestValueX());
-          graphView.getViewport().scrollToEnd();
-        } catch (Exception e) {
-          Log.e(TAG, "[run] exception: " + e);
-        }
+        seriesX.resetData(dataPointsX.toArray(new MyDataPoint[dataPointsX.size()]));
+        seriesY.resetData(dataPointsY.toArray(new MyDataPoint[dataPointsY.size()]));
+        seriesZ.resetData(dataPointsZ.toArray(new MyDataPoint[dataPointsZ.size()]));
+        graphView.getViewport().setMinX(seriesX.getLowestValueX());
+        graphView.getViewport().setMaxX(seriesX.getHighestValueX());
+        graphView.getViewport().scrollToEnd();
         mHandler.postDelayed(this, DELAY_REFRESH);
       }
     }
@@ -65,26 +60,21 @@ public class FragmentXYZ extends GraphFragment {
 
   public static void appendData(@NonNull MyDataPoint dataPointX, @NonNull MyDataPoint dataPointY,
       @NonNull MyDataPoint dataPointZ) {
-    AsyncTask.execute(() -> {
-      synchronized (dataPointsX) {
-        if (dataPointsX.size() >= MAX_DATA_POINTS) {
-          dataPointsX.remove(0);
-        }
-        dataPointsX.add(dataPointX);
+    addItemToList(dataPointsX, dataPointX);
+    addItemToList(dataPointsY, dataPointY);
+    addItemToList(dataPointsZ, dataPointZ);
+  }
+
+  private static synchronized void addItemToList(@NonNull final ArrayList<MyDataPoint> list,
+      @NonNull MyDataPoint item) {
+    list.add(item);
+    if (list.size() >= MAX_DATA_POINTS) {
+      Iterator<MyDataPoint> iterator = list.iterator();
+      if (iterator.hasNext()) {
+        iterator.next();
+        iterator.remove();
       }
-      synchronized (dataPointsY) {
-        if (dataPointsY.size() >= MAX_DATA_POINTS) {
-          dataPointsY.remove(0);
-        }
-        dataPointsY.add(dataPointY);
-      }
-      synchronized (dataPointsZ) {
-        if (dataPointsZ.size() >= MAX_DATA_POINTS) {
-          dataPointsZ.remove(0);
-        }
-        dataPointsZ.add(dataPointZ);
-      }
-    });
+    }
   }
 
   public static List<MyDataPoint> getPeakWindow() {

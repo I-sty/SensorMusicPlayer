@@ -1,6 +1,5 @@
 package com.kalosis.sensormusicplayer.fragments;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,10 +16,9 @@ import com.kalosis.sensormusicplayer.MyDataPoint;
 import com.kalosis.sensormusicplayer.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class FragmentX extends GraphFragment {
-
-  private static final String TAG = FragmentX.class.getName();
 
   @NonNull
   private static final ArrayList<MyDataPoint> dataPoints = new ArrayList<>();
@@ -32,31 +30,35 @@ public class FragmentX extends GraphFragment {
   private Handler mHandler;
 
   private Runnable refreshGraph = new Runnable() {
+
     @Override
     public void run() {
       synchronized (dataPoints) {
         MyDataPoint[] list = dataPoints.toArray(new MyDataPoint[dataPoints.size()]);
         series.resetData(list);
-          graphView.getViewport().setMinX(series.getLowestValueX());
-          graphView.getViewport().setMaxX(series.getHighestValueX());
-          graphView.getViewport().scrollToEnd();
+        graphView.getViewport().setMinX(series.getLowestValueX());
+        graphView.getViewport().setMaxX(series.getHighestValueX());
+        graphView.getViewport().scrollToEnd();
         mHandler.postDelayed(this, DELAY_REFRESH);
       }
     }
   };
 
-  public static void appendData(MyDataPoint dataPoint) {
-    if (dataPoint == null) {
-      return;
-    }
-    AsyncTask.execute(() -> {
-      synchronized (dataPoints) {
-        if (dataPoints.size() >= MAX_DATA_POINTS) {
-          dataPoints.remove(0);
-        }
-        dataPoints.add(dataPoint);
+  /**
+   * Appends the specified element to the end of this list and remove the first element if the list exceeded the preset size.
+   *
+   * @param dataPoint
+   *     *     The element to append.
+   */
+  public static synchronized void appendData(@NonNull MyDataPoint dataPoint) {
+    dataPoints.add(dataPoint);
+    synchronized (dataPoints) {
+      if (dataPoints.size() >= MAX_DATA_POINTS) {
+        Iterator<MyDataPoint> iterator = dataPoints.iterator();
+        iterator.next();
+        iterator.remove();
       }
-    });
+    }
   }
 
   @Nullable
