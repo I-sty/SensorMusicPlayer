@@ -21,12 +21,12 @@ import java.util.Iterator;
 
 public class FragmentX extends GraphFragment {
 
+  private static final String TAG = FragmentX.class.getName();
+
   @NonNull
   private static final ArrayList<MyDataPoint> dataPoints = new ArrayList<>();
 
   private static final LineGraphSeries<MyDataPoint> series = new LineGraphSeries<>();
-
-  private static final String TAG = FragmentX.class.getName();
 
   private GraphView graphView;
 

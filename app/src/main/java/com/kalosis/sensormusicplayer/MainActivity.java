@@ -27,14 +27,12 @@ public class MainActivity extends AppCompatActivity {
   /** Delay to start peak calculation */
   private static final short DELAY_CALC_PEAK = 1300;
 
+  /** Delay before the sensor recording start */
+  private static final short DELAY_RECORD_SENSOR = 600;
+
   private static final int PEAK_THRESHOLD = 7;
 
   private static final String TAG = MainActivity.class.getName();
-
-  private Sensor mSensor;
-
-  @Nullable
-  private SensorManager mSensorManager;
 
   private Handler mHandler;
 
@@ -42,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void run() {
-      final ArrayList<MyDataPoint> list =
-          new ArrayList<>(FragmentXYZ.getPeakWindow());
+      final ArrayList<MyDataPoint> list = new ArrayList<>(FragmentXYZ.getPeakWindow());
       if (list.size() == 0) {
         Log.d(TAG, "[calcPeak] empty list");
         mHandler.postDelayed(this, DELAY_CALC_PEAK);
@@ -60,19 +57,22 @@ public class MainActivity extends AppCompatActivity {
         }
       });
       final DataPoint peakPoint = list.get(0);
-      Log.d(TAG, "[run] \nstart: " + list.get(0) + "\nend: " + list.get(list.size() - 1) +
-          "\npeak: " + peakPoint);
+      Log.d(TAG, "[run] \nstart: " + list.get(0) + "\nend: " + list.get(list.size() - 1) + "\npeak: " + peakPoint);
 
       //check if the peak is higher then a threshold
       double peak = peakPoint.getY();
       if (peak >= PEAK_THRESHOLD) {
         Log.i(TAG, "[run] Peak found: " + peakPoint);
-        Toast.makeText(getApplicationContext(), "Peak found: " + peakPoint, Toast.LENGTH_SHORT)
-            .show();
+        Toast.makeText(getApplicationContext(), "Peak found: " + peakPoint, Toast.LENGTH_SHORT).show();
       }
       mHandler.postDelayed(this, DELAY_CALC_PEAK);
     }
   };
+
+  private Sensor mSensor;
+
+  @Nullable
+  private SensorManager mSensorManager;
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -103,8 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-    SectionsPagerAdapter mSectionsPagerAdapter =
-        new SectionsPagerAdapter(getSupportFragmentManager());
+    SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
     ViewPager mViewPager = findViewById(R.id.container);
     mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -112,8 +111,6 @@ public class MainActivity extends AppCompatActivity {
 
     mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
     tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-
-    //mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
   }
 
   @Override
@@ -128,25 +125,14 @@ public class MainActivity extends AppCompatActivity {
   protected void onResume() {
     super.onResume();
     new Handler().postDelayed(() -> {
-      mSensorManager =
-          (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+      mSensorManager = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
       if (mSensorManager != null) {
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager
-            .registerListener(PlaceholderFragment.getAccelerometerEventListener(), mSensor,
-                SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(PlaceholderFragment.getAccelerometerEventListener(), mSensor,
+            SensorManager.SENSOR_DELAY_UI);
       }
-    }, 600);
+    }, DELAY_RECORD_SENSOR);
 
-//    JobInfo.Builder builder =
-//        new JobInfo.Builder(1, new ComponentName(getPackageName(), PeakCalculator.class.getName()));
-//    builder.setPeriodic(500);
-//    builder.setBackoffCriteria(500, JobInfo.BACKOFF_POLICY_LINEAR);
-//    builder.setRequiresCharging(false);
-//
-//    if (mJobScheduler.schedule(builder.build()) <= 0) {
-//      Log.e(TAG, "onCreate: Some error while scheduling the job");
-//    }
     mHandler = new Handler(Looper.myLooper());
     mHandler.postDelayed(calcPeak, DELAY_CALC_PEAK);
   }

@@ -31,6 +31,7 @@ public class PlaceholderFragment extends Fragment {
    */
   private static final String ARG_SECTION_NUMBER = "section_number";
 
+  /** Threshold to avoid unnecessary data, example small moves of the hand */
   private static final float THRESHOLD = 0.3f;
 
   @Nullable
@@ -38,7 +39,7 @@ public class PlaceholderFragment extends Fragment {
 
   private final Counter counter = new Counter();
 
-  private float[] gravity = new float[3];
+  private final float[] gravity = new float[3];
 
   public PlaceholderFragment() {
   }
@@ -61,11 +62,9 @@ public class PlaceholderFragment extends Fragment {
   }
 
   @Override
-  public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState) {
+  public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     final Section sectionNumber =
-        getArguments() != null ? Section.values()[getArguments().getInt(ARG_SECTION_NUMBER) - 1] :
-            SECTION_XYZ;
+        getArguments() != null ? Section.values()[getArguments().getInt(ARG_SECTION_NUMBER) - 1] : SECTION_XYZ;
     switch (sectionNumber) {
       case SECTION_Y: {
         FragmentY fragmentY = new FragmentY();
@@ -126,14 +125,11 @@ public class PlaceholderFragment extends Fragment {
           gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
           // Remove the gravity contribution with the high-pass filter.
-          MyDataPoint dataPointX =
-              new MyDataPoint(counter.getCounter(), initYValue(event.values[0] - gravity[0]));
+          MyDataPoint dataPointX = new MyDataPoint(counter.getCounter(), formatRawValue(event.values[0] - gravity[0]));
           FragmentX.appendData(dataPointX);
-          MyDataPoint dataPointY =
-              new MyDataPoint(counter.getCounter(), initYValue(event.values[1] - gravity[1]));
+          MyDataPoint dataPointY = new MyDataPoint(counter.getCounter(), formatRawValue(event.values[1] - gravity[1]));
           FragmentY.appendData(dataPointY);
-          MyDataPoint dataPointZ =
-              new MyDataPoint(counter.getCounter(), initYValue(event.values[2] - gravity[2]));
+          MyDataPoint dataPointZ = new MyDataPoint(counter.getCounter(), formatRawValue(event.values[2] - gravity[2]));
           FragmentZ.appendData(dataPointZ);
           FragmentXYZ.appendData(dataPointX, dataPointY, dataPointZ);
           counter.increment();
@@ -142,7 +138,14 @@ public class PlaceholderFragment extends Fragment {
     };
   }
 
-  private static double initYValue(float v) {
+  /**
+   * Format the raw data.
+   *
+   * @param v The value
+   *
+   * @return The value if it is bigger than a threshold or zero.
+   */
+  private static double formatRawValue(float v) {
     return Math.abs(v) < THRESHOLD ? 0f : v;
   }
 }

@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.CircularArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,19 +19,21 @@ import com.kalosis.sensormusicplayer.MyDataPoint;
 import com.kalosis.sensormusicplayer.R;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
 public class FragmentXYZ extends GraphFragment {
 
-  @NonNull
-  private static final ArrayList<MyDataPoint> dataPointsX = new ArrayList<>();
+  private static final int MIN_CIRCULAR_ARRAY_SIZE = 2 << 6;
 
   @NonNull
-  private static final ArrayList<MyDataPoint> dataPointsY = new ArrayList<>();
+  private static final CircularArray<MyDataPoint> dataPointsX = new CircularArray<>(MIN_CIRCULAR_ARRAY_SIZE);
 
   @NonNull
-  private static final ArrayList<MyDataPoint> dataPointsZ = new ArrayList<>();
+  private static final CircularArray<MyDataPoint> dataPointsY = new CircularArray<>(MIN_CIRCULAR_ARRAY_SIZE);
+
+  @NonNull
+  private static final CircularArray<MyDataPoint> dataPointsZ = new CircularArray<>(MIN_CIRCULAR_ARRAY_SIZE);
 
   private static final LineGraphSeries<MyDataPoint> seriesX = new LineGraphSeries<>();
 
@@ -38,33 +41,35 @@ public class FragmentXYZ extends GraphFragment {
 
   private static final LineGraphSeries<MyDataPoint> seriesZ = new LineGraphSeries<>();
 
-  private static final byte PEAK_LIST_SIZE = 50;
-
   private GraphView graphView;
 
   private Handler mHandler;
 
-  private Runnable refreshGraph = new Runnable() {
+  private final Runnable refreshGraph = new Runnable() {
 
     @Override
     public void run() {
       synchronized (dataPointsX) {
-        seriesX.resetData(dataPointsX.toArray(new MyDataPoint[dataPointsX.size()]));
-        seriesY.resetData(dataPointsY.toArray(new MyDataPoint[dataPointsY.size()]));
-        seriesZ.resetData(dataPointsZ.toArray(new MyDataPoint[dataPointsZ.size()]));
-        graphView.getViewport().setMinX(seriesX.getLowestValueX());
-        graphView.getViewport().setMaxX(seriesX.getHighestValueX());
-        graphView.getViewport().scrollToEnd();
-        mHandler.postDelayed(this, DELAY_REFRESH);
+        seriesX.resetData(toArray(dataPointsX));
       }
+      synchronized (dataPointsY) {
+        seriesY.resetData(toArray(dataPointsY));
+      }
+      synchronized (dataPointsY) {
+        seriesZ.resetData(toArray(dataPointsZ));
+      }
+      graphView.getViewport().setMinX(seriesZ.getLowestValueX());
+      graphView.getViewport().setMaxX(seriesZ.getHighestValueX());
+      graphView.getViewport().scrollToEnd();
+      mHandler.postDelayed(this, DELAY_REFRESH);
     }
   };
 
   public static void appendData(@NonNull MyDataPoint dataPointX, @NonNull MyDataPoint dataPointY,
       @NonNull MyDataPoint dataPointZ) {
-    addItemToList(dataPointsX, dataPointX);
-    addItemToList(dataPointsY, dataPointY);
-    addItemToList(dataPointsZ, dataPointZ);
+    dataPointsX.addLast(dataPointX);
+    dataPointsY.addLast(dataPointY);
+    dataPointsZ.addLast(dataPointZ);
   }
 
   /**
@@ -79,12 +84,7 @@ public class FragmentXYZ extends GraphFragment {
       if (size == 0) {
         return new ArrayList<>();
       }
-      if (size <= PEAK_LIST_SIZE) {
-        // TODO: 8/18/18 at first run while the size of the list is less then PEAK_LIST_SIZE
-        // this returns the "same" window and _a_ peak has been found more than once time
-        return dataPointsZ.subList(0, size);
-      }
-      return dataPointsZ.subList(size - PEAK_LIST_SIZE, size);
+      return Arrays.asList(toArray(dataPointsZ));
     }
   }
 
@@ -114,21 +114,21 @@ public class FragmentXYZ extends GraphFragment {
     return rootView;
   }
 
-  private static synchronized void addItemToList(@NonNull final ArrayList<MyDataPoint> list,
-      @NonNull MyDataPoint item) {
-    list.add(item);
-    if (list.size() >= MAX_DATA_POINTS) {
-      Iterator<MyDataPoint> iterator = list.iterator();
-      if (iterator.hasNext()) {
-        iterator.next();
-        iterator.remove();
-      }
-    }
-  }
-
   @Override
   public void onPause() {
     super.onPause();
     mHandler.removeCallbacks(refreshGraph);
+  }
+
+  @NonNull
+  private synchronized static MyDataPoint[] toArray(CircularArray<MyDataPoint> circularArray) {
+    if (circularArray == null || circularArray.isEmpty()) {
+      return new MyDataPoint[0];
+    }
+    final MyDataPoint[] points = new MyDataPoint[circularArray.size()];
+    for (int i = 0; i < circularArray.size(); ++i) {
+      points[i] = circularArray.get(i);
+    }
+    return points;
   }
 }
