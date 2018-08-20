@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,30 +26,37 @@ public class FragmentX extends GraphFragment {
 
   private static final LineGraphSeries<MyDataPoint> series = new LineGraphSeries<>();
 
+  private static final String TAG = FragmentX.class.getName();
+
   private GraphView graphView;
 
   private Handler mHandler;
 
-  private Runnable refreshGraph = new Runnable() {
+  private final Runnable refreshGraph = new Runnable() {
 
     @Override
     public void run() {
       synchronized (dataPoints) {
-        MyDataPoint[] list = dataPoints.toArray(new MyDataPoint[dataPoints.size()]);
-        series.resetData(list);
-        graphView.getViewport().setMinX(series.getLowestValueX());
-        graphView.getViewport().setMaxX(series.getHighestValueX());
-        graphView.getViewport().scrollToEnd();
-        mHandler.postDelayed(this, DELAY_REFRESH);
+        try {
+          MyDataPoint[] list = dataPoints.toArray(new MyDataPoint[dataPoints.size()]);
+          series.resetData(list);
+          graphView.getViewport().setMinX(series.getLowestValueX());
+          graphView.getViewport().setMaxX(series.getHighestValueX());
+          graphView.getViewport().scrollToEnd();
+        } catch (Exception e) {
+          Log.e(TAG, "[refreshGraph] " + e);
+        } finally {
+          mHandler.postDelayed(this, DELAY_REFRESH);
+        }
       }
     }
   };
 
   /**
-   * Appends the specified element to the end of this list and remove the first element if the list exceeded the preset size.
+   * Appends the specified element to the end of this list and remove the first element if the list
+   * exceeded the preset size.
    *
-   * @param dataPoint
-   *     *     The element to append.
+   * @param dataPoint The element to append.
    */
   public static synchronized void appendData(@NonNull MyDataPoint dataPoint) {
     dataPoints.add(dataPoint);

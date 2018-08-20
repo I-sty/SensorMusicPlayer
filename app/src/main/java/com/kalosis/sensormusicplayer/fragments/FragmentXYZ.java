@@ -38,6 +38,8 @@ public class FragmentXYZ extends GraphFragment {
 
   private static final LineGraphSeries<MyDataPoint> seriesZ = new LineGraphSeries<>();
 
+  private static final byte PEAK_LIST_SIZE = 50;
+
   private GraphView graphView;
 
   private Handler mHandler;
@@ -65,29 +67,24 @@ public class FragmentXYZ extends GraphFragment {
     addItemToList(dataPointsZ, dataPointZ);
   }
 
-  private static synchronized void addItemToList(@NonNull final ArrayList<MyDataPoint> list,
-      @NonNull MyDataPoint item) {
-    list.add(item);
-    if (list.size() >= MAX_DATA_POINTS) {
-      Iterator<MyDataPoint> iterator = list.iterator();
-      if (iterator.hasNext()) {
-        iterator.next();
-        iterator.remove();
-      }
-    }
-  }
-
+  /**
+   * Return the peak window of the Z axis
+   *
+   * @return The sublist of the Z axis.
+   */
+  @NonNull
   public static List<MyDataPoint> getPeakWindow() {
     synchronized (dataPointsZ) {
       final int size = dataPointsZ.size();
-      final byte LIST_SIZE = 50;
       if (size == 0) {
         return new ArrayList<>();
       }
-      if (size < LIST_SIZE) {
+      if (size <= PEAK_LIST_SIZE) {
+        // TODO: 8/18/18 at first run while the size of the list is less then PEAK_LIST_SIZE
+        // this returns the "same" window and _a_ peak has been found more than once time
         return dataPointsZ.subList(0, size);
       }
-      return dataPointsZ.subList(size - LIST_SIZE, size);
+      return dataPointsZ.subList(size - PEAK_LIST_SIZE, size);
     }
   }
 
@@ -115,6 +112,18 @@ public class FragmentXYZ extends GraphFragment {
     mHandler = new Handler(Looper.myLooper());
     mHandler.postDelayed(refreshGraph, DELAY_REFRESH);
     return rootView;
+  }
+
+  private static synchronized void addItemToList(@NonNull final ArrayList<MyDataPoint> list,
+      @NonNull MyDataPoint item) {
+    list.add(item);
+    if (list.size() >= MAX_DATA_POINTS) {
+      Iterator<MyDataPoint> iterator = list.iterator();
+      if (iterator.hasNext()) {
+        iterator.next();
+        iterator.remove();
+      }
+    }
   }
 
   @Override

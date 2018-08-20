@@ -85,8 +85,9 @@ public class PlaceholderFragment extends Fragment {
       }
       case SECTION_CONFIG: {
         FragmentConfig fragmentConfig = new FragmentConfig();
-        fragmentConfig.onCreate(savedInstanceState);
-        return fragmentConfig.getView();
+        //        fragmentConfig.onCreate(savedInstanceState);
+        //        return fragmentConfig.getView();
+        return fragmentConfig.onCreateView(inflater, container, savedInstanceState);
       }
       default: {
         return null;
@@ -141,7 +142,7 @@ public class PlaceholderFragment extends Fragment {
     };
   }
 
-  private double initYValue(float v) {
+  private static double initYValue(float v) {
     return Math.abs(v) < THRESHOLD ? 0f : v;
   }
 }

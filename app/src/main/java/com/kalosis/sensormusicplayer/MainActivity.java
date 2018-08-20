@@ -24,11 +24,12 @@ import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
 
-  private static final short DELAY_CALC_PEAK = 1200;
+  /** Delay to start peak calculation */
+  private static final short DELAY_CALC_PEAK = 1300;
 
   private static final int PEAK_THRESHOLD = 7;
 
-  private String TAG = MainActivity.class.getName();
+  private static final String TAG = MainActivity.class.getName();
 
   private Sensor mSensor;
 
@@ -37,16 +38,18 @@ public class MainActivity extends AppCompatActivity {
 
   private Handler mHandler;
 
-  private Runnable calcPeak = new Runnable() {
+  private final Runnable calcPeak = new Runnable() {
 
     @Override
     public void run() {
       final ArrayList<MyDataPoint> list =
           new ArrayList<>(FragmentXYZ.getPeakWindow());
       if (list.size() == 0) {
+        Log.d(TAG, "[calcPeak] empty list");
         mHandler.postDelayed(this, DELAY_CALC_PEAK);
         return;
       }
+      Log.d(TAG, "[calcPeak] list size = " + list.size());
       Collections.sort(list, (o1, o2) -> {
         if (Math.abs(o1.getY()) > Math.abs(o2.getY())) {
           return -1;
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
           return 0;
         }
       });
-      DataPoint peakPoint = list.get(0);
+      final DataPoint peakPoint = list.get(0);
       Log.d(TAG, "[run] \nstart: " + list.get(0) + "\nend: " + list.get(list.size() - 1) +
           "\npeak: " + peakPoint);
 
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
     //noinspection SimplifiableIfStatement
     if (id == R.id.action_settings) {
+      Toast.makeText(getApplicationContext(), "Settings is not implemented yet", Toast.LENGTH_SHORT).show();
       return true;
     }
 

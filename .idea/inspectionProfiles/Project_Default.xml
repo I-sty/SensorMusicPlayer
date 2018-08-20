@@ -1,0 +1,43 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="AndroidLintNewerVersionAvailable" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ArrayEquality" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="BooleanVariableAlwaysNegated" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ChannelResource" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="insideTryAllowed" value="false" />
+    </inspection_tool>
+    <inspection_tool class="ClassWithMultipleLoggers" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="loggerNamesString" value="java.util.logging.Logger,org.slf4j.Logger,org.apache.commons.logging.Log,org.apache.log4j.Logger" />
+    </inspection_tool>
+    <inspection_tool class="EnumerationCanBeIteration" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="FieldMayBeFinal" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="FieldMayBeStatic" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="GroovyVariableCanBeFinal" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="IOResource" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredTypesString" value="java.io.ByteArrayOutputStream,java.io.ByteArrayInputStream,java.io.StringBufferInputStream,java.io.CharArrayWriter,java.io.CharArrayReader,java.io.StringWriter,java.io.StringReader" />
+      <option name="insideTryAllowed" value="false" />
+    </inspection_tool>
+    <inspection_tool class="InnerClassMayBeStatic" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="MapReplaceableByEnumMap" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="MethodMayBeStatic" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_onlyPrivateOrFinal" value="false" />
+      <option name="m_ignoreEmptyMethods" value="true" />
+    </inspection_tool>
+    <inspection_tool class="ObjectAllocationInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="RandomDoubleForRandomInteger" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="SetReplaceableByEnumSet" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="SocketResource" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="insideTryAllowed" value="false" />
+    </inspection_tool>
+    <inspection_tool class="StringBufferField" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="StringBufferToStringInConcatenation" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="StringEqualsEmptyString" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="StringReplaceableByStringBuffer" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="onlyWarnOnLoop" value="true" />
+    </inspection_tool>
+    <inspection_tool class="ToArrayCallWithZeroLengthArrayArgument" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnusedLibrary" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ZeroLengthArrayInitialization" enabled="true" level="WARNING" enabled_by_default="true" />
+  </profile>
+</component>
