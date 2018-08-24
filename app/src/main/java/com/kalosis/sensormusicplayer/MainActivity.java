@@ -17,7 +17,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.series.DataPoint;
+import com.kalosis.sensormusicplayer.data.Buffer;
+import com.kalosis.sensormusicplayer.data.MyDataPoint;
 import com.kalosis.sensormusicplayer.fragments.FragmentXYZ;
+import com.kalosis.sensormusicplayer.rest.RESTClient;
+import com.kalosis.sensormusicplayer.rest.interfaces.CreateBuffer;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +29,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
   /** Delay to start peak calculation */
-  private static final short DELAY_CALC_PEAK = 1300;
+  private static final short DELAY_CALC_PEAK = 2000;
 
   /** Delay before the sensor recording start */
   private static final short DELAY_RECORD_SENSOR = 600;
@@ -36,38 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
   private Handler mHandler;
 
-  private final Runnable calcPeak = new Runnable() {
-
-    @Override
-    public void run() {
-      final List<MyDataPoint> list = FragmentXYZ.getPeakWindow();
-      if (list.size() == 0) {
-        Log.d(TAG, "[calcPeak] empty list");
-        mHandler.postDelayed(this, DELAY_CALC_PEAK);
-        return;
-      }
-      Log.d(TAG, "[calcPeak] list size = " + list.size());
-      Collections.sort(list, (o1, o2) -> {
-        if (Math.abs(o1.getY()) > Math.abs(o2.getY())) {
-          return -1;
-        } else if (Math.abs(o1.getY()) > Math.abs(o2.getY())) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
-      final DataPoint peakPoint = list.get(0);
-      Log.d(TAG, "[run] \nstart: " + list.get(0) + "\nend: " + list.get(list.size() - 1) + "\npeak: " + peakPoint);
-
-      //check if the peak is higher then a threshold
-      double peak = peakPoint.getY();
-      if (peak >= PEAK_THRESHOLD) {
-        Log.i(TAG, "[run] Peak found: " + peakPoint);
-        Toast.makeText(getApplicationContext(), "Peak found: " + peakPoint, Toast.LENGTH_SHORT).show();
-      }
-      mHandler.postDelayed(this, DELAY_CALC_PEAK);
-    }
-  };
+  RESTClient restClient = new RESTClient();
 
   private Sensor mSensor;
 
@@ -96,6 +69,50 @@ public class MainActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
+  private final Runnable calcPeak = new Runnable() {
+
+    @Override
+    public void run() {
+      final List<MyDataPoint> list = FragmentXYZ.getPeakWindow();
+      if (list.size() == 0) {
+        Log.d(TAG, "[calcPeak] empty list");
+        mHandler.postDelayed(this, DELAY_CALC_PEAK);
+        return;
+      }
+      Log.d(TAG, "[calcPeak] list size = " + list.size());
+      restClient.createBuffer(new Buffer(list), new CreateBuffer() {
+        @Override
+        public void onCreated() {
+          Log.i(TAG, "[onCreated]");
+        }
+
+        @Override
+        public void onError(String message) {
+          Log.e(TAG, "[onError]" + message);
+        }
+      });
+      Collections.sort(list, (o1, o2) -> {
+        if (Math.abs(o1.getY()) > Math.abs(o2.getY())) {
+          return -1;
+        } else if (Math.abs(o1.getY()) > Math.abs(o2.getY())) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+      final DataPoint peakPoint = list.get(0);
+      Log.d(TAG, "[run] \nstart: " + list.get(0) + "\nend: " + list.get(list.size() - 1) + "\npeak: " + peakPoint);
+
+      //check if the peak is higher then a threshold
+      double peak = peakPoint.getY();
+      if (peak >= PEAK_THRESHOLD) {
+        Log.i(TAG, "[run] Peak found: " + peakPoint);
+        Toast.makeText(getApplicationContext(), "Peak found: " + peakPoint, Toast.LENGTH_SHORT).show();
+      }
+      mHandler.postDelayed(this, DELAY_CALC_PEAK);
+    }
+  };
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -111,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
     tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
   }
 
   @Override

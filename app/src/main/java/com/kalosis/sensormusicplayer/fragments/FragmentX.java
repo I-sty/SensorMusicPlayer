@@ -13,18 +13,17 @@ import android.view.ViewGroup;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.kalosis.sensormusicplayer.MyDataPoint;
 import com.kalosis.sensormusicplayer.R;
+import com.kalosis.sensormusicplayer.data.MyDataPoint;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
 
 public class FragmentX extends GraphFragment {
 
   private static final String TAG = FragmentX.class.getName();
 
   @NonNull
-  private static final ArrayList<MyDataPoint> dataPoints = new ArrayList<>();
+  private static final CircularFifoBuffer dataPoints = new CircularFifoBuffer(CIRCULAR_BUFFER_SIZE);
 
   private static final LineGraphSeries<MyDataPoint> series = new LineGraphSeries<>();
 
@@ -38,8 +37,7 @@ public class FragmentX extends GraphFragment {
     public void run() {
       synchronized (dataPoints) {
         try {
-          MyDataPoint[] list = dataPoints.toArray(new MyDataPoint[dataPoints.size()]);
-          series.resetData(list);
+          series.resetData((MyDataPoint[]) dataPoints.toArray(new MyDataPoint[dataPoints.size()]));
           graphView.getViewport().setMinX(series.getLowestValueX());
           graphView.getViewport().setMaxX(series.getHighestValueX());
           graphView.getViewport().scrollToEnd();
@@ -52,20 +50,9 @@ public class FragmentX extends GraphFragment {
     }
   };
 
-  /**
-   * Appends the specified element to the end of this list and remove the first element if the list
-   * exceeded the preset size.
-   *
-   * @param dataPoint The element to append.
-   */
-  public static synchronized void appendData(@NonNull MyDataPoint dataPoint) {
-    dataPoints.add(dataPoint);
+  public static void appendData(@NonNull MyDataPoint dataPoint) {
     synchronized (dataPoints) {
-      if (dataPoints.size() >= MAX_DATA_POINTS) {
-        Iterator<MyDataPoint> iterator = dataPoints.iterator();
-        iterator.next();
-        iterator.remove();
-      }
+      dataPoints.add(dataPoint);
     }
   }
 
@@ -89,5 +76,12 @@ public class FragmentX extends GraphFragment {
   public void onPause() {
     super.onPause();
     mHandler.removeCallbacks(refreshGraph);
+    dataPoints.clear();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    dataPoints.clear();
   }
 }

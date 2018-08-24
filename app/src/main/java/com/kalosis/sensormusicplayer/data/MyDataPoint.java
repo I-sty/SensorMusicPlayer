@@ -1,11 +1,11 @@
-package com.kalosis.sensormusicplayer;
+package com.kalosis.sensormusicplayer.data;
 
 import android.support.annotation.NonNull;
 
 import com.jjoe64.graphview.series.DataPoint;
 
 public class MyDataPoint extends DataPoint implements Comparable<MyDataPoint> {
-  MyDataPoint(double x, double y) {
+  public MyDataPoint(double x, double y) {
     super(x, y);
   }
 

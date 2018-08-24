@@ -1,6 +1,5 @@
 package com.kalosis.sensormusicplayer.fragments;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,17 +12,17 @@ import android.view.ViewGroup;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.kalosis.sensormusicplayer.MyDataPoint;
 import com.kalosis.sensormusicplayer.R;
+import com.kalosis.sensormusicplayer.data.MyDataPoint;
 
-import java.util.ArrayList;
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
 
 public class FragmentZ extends GraphFragment {
 
   private static final String TAG = FragmentZ.class.getName();
 
   @NonNull
-  private static final ArrayList<MyDataPoint> dataPoints = new ArrayList<>();
+  private static final CircularFifoBuffer dataPoints = new CircularFifoBuffer(CIRCULAR_BUFFER_SIZE);
 
   private static final LineGraphSeries<MyDataPoint> series = new LineGraphSeries<>();
 
@@ -31,31 +30,23 @@ public class FragmentZ extends GraphFragment {
 
   private Handler mHandler;
 
-  private Runnable refreshGraph = new Runnable() {
+  private final Runnable refreshGraph = new Runnable() {
     @Override
     public void run() {
       synchronized (dataPoints) {
-        series.resetData(dataPoints.toArray(new MyDataPoint[dataPoints.size()]));
-          graphView.getViewport().setMinX(series.getLowestValueX());
-          graphView.getViewport().setMaxX(series.getHighestValueX());
-          graphView.getViewport().scrollToEnd();
+        series.resetData((MyDataPoint[]) dataPoints.toArray(new MyDataPoint[dataPoints.size()]));
+        graphView.getViewport().setMinX(series.getLowestValueX());
+        graphView.getViewport().setMaxX(series.getHighestValueX());
+        graphView.getViewport().scrollToEnd();
         mHandler.postDelayed(this, DELAY_REFRESH);
       }
     }
   };
 
-  public static void appendData(MyDataPoint dataPoint) {
-    if (dataPoint == null) {
-      return;
+  public static void appendData(@NonNull MyDataPoint dataPoint) {
+    synchronized (dataPoints) {
+      dataPoints.add(dataPoint);
     }
-    AsyncTask.execute(() -> {
-      synchronized (dataPoints) {
-        if (dataPoints.size() >= MAX_DATA_POINTS) {
-          dataPoints.remove(0);
-        }
-        dataPoints.add(dataPoint);
-      }
-    });
   }
 
   @Nullable
@@ -78,5 +69,12 @@ public class FragmentZ extends GraphFragment {
   public void onPause() {
     super.onPause();
     mHandler.removeCallbacks(refreshGraph);
+    dataPoints.clear();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    dataPoints.clear();
   }
 }

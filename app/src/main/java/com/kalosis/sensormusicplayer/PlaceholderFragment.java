@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.kalosis.sensormusicplayer.controller.Section;
+import com.kalosis.sensormusicplayer.data.MyDataPoint;
 import com.kalosis.sensormusicplayer.fragments.FragmentConfig;
 import com.kalosis.sensormusicplayer.fragments.FragmentX;
 import com.kalosis.sensormusicplayer.fragments.FragmentXYZ;

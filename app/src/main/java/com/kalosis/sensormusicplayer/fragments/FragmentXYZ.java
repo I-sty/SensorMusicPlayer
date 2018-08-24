@@ -14,8 +14,8 @@ import android.view.ViewGroup;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.kalosis.sensormusicplayer.MyDataPoint;
 import com.kalosis.sensormusicplayer.R;
+import com.kalosis.sensormusicplayer.data.MyDataPoint;
 
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 
@@ -24,16 +24,14 @@ import java.util.List;
 
 public class FragmentXYZ extends GraphFragment {
 
-  private static final int MIN_CIRCULAR_ARRAY_SIZE = 2 << 5;
+  @NonNull
+  private static final CircularFifoBuffer dataPointsX = new CircularFifoBuffer(CIRCULAR_BUFFER_SIZE);
 
   @NonNull
-  private static final CircularFifoBuffer dataPointsX = new CircularFifoBuffer(MIN_CIRCULAR_ARRAY_SIZE);
+  private static final CircularFifoBuffer dataPointsY = new CircularFifoBuffer(CIRCULAR_BUFFER_SIZE);
 
   @NonNull
-  private static final CircularFifoBuffer dataPointsY = new CircularFifoBuffer(MIN_CIRCULAR_ARRAY_SIZE);
-
-  @NonNull
-  private static final CircularFifoBuffer dataPointsZ = new CircularFifoBuffer(MIN_CIRCULAR_ARRAY_SIZE);
+  private static final CircularFifoBuffer dataPointsZ = new CircularFifoBuffer(CIRCULAR_BUFFER_SIZE);
 
   private static final LineGraphSeries<MyDataPoint> seriesX = new LineGraphSeries<>();
 

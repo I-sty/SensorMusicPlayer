@@ -29,7 +29,7 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
-    compileOnly 'org.projectlombok:lombok:1.18.2'
-    annotationProcessor 'org.projectlombok:lombok:1.18.2'
     implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.squareup.moshi:moshi:1.6.0'
 }
