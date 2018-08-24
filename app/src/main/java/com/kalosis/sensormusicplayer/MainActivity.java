@@ -19,8 +19,8 @@ import android.widget.Toast;
 import com.jjoe64.graphview.series.DataPoint;
 import com.kalosis.sensormusicplayer.fragments.FragmentXYZ;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void run() {
-      final ArrayList<MyDataPoint> list = new ArrayList<>(FragmentXYZ.getPeakWindow());
+      final List<MyDataPoint> list = FragmentXYZ.getPeakWindow();
       if (list.size() == 0) {
         Log.d(TAG, "[calcPeak] empty list");
         mHandler.postDelayed(this, DELAY_CALC_PEAK);
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
       if (mSensorManager != null) {
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(PlaceholderFragment.getAccelerometerEventListener(), mSensor,
-            SensorManager.SENSOR_DELAY_UI);
+            SensorManager.SENSOR_DELAY_GAME);
       }
     }, DELAY_RECORD_SENSOR);
 

@@ -1,5 +1,8 @@
 package com.kalosis.sensormusicplayer;
 
+import lombok.Getter;
+
+@Getter
 @lombok.Data
 public class Counter {
   private long counter;

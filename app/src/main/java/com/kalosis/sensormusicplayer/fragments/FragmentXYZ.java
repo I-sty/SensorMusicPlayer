@@ -7,7 +7,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.CircularArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,22 +17,23 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kalosis.sensormusicplayer.MyDataPoint;
 import com.kalosis.sensormusicplayer.R;
 
-import java.util.ArrayList;
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
+
 import java.util.Arrays;
 import java.util.List;
 
 public class FragmentXYZ extends GraphFragment {
 
-  private static final int MIN_CIRCULAR_ARRAY_SIZE = 2 << 6;
+  private static final int MIN_CIRCULAR_ARRAY_SIZE = 2 << 5;
 
   @NonNull
-  private static final CircularArray<MyDataPoint> dataPointsX = new CircularArray<>(MIN_CIRCULAR_ARRAY_SIZE);
+  private static final CircularFifoBuffer dataPointsX = new CircularFifoBuffer(MIN_CIRCULAR_ARRAY_SIZE);
 
   @NonNull
-  private static final CircularArray<MyDataPoint> dataPointsY = new CircularArray<>(MIN_CIRCULAR_ARRAY_SIZE);
+  private static final CircularFifoBuffer dataPointsY = new CircularFifoBuffer(MIN_CIRCULAR_ARRAY_SIZE);
 
   @NonNull
-  private static final CircularArray<MyDataPoint> dataPointsZ = new CircularArray<>(MIN_CIRCULAR_ARRAY_SIZE);
+  private static final CircularFifoBuffer dataPointsZ = new CircularFifoBuffer(MIN_CIRCULAR_ARRAY_SIZE);
 
   private static final LineGraphSeries<MyDataPoint> seriesX = new LineGraphSeries<>();
 
@@ -67,9 +67,9 @@ public class FragmentXYZ extends GraphFragment {
 
   public static void appendData(@NonNull MyDataPoint dataPointX, @NonNull MyDataPoint dataPointY,
       @NonNull MyDataPoint dataPointZ) {
-    dataPointsX.addLast(dataPointX);
-    dataPointsY.addLast(dataPointY);
-    dataPointsZ.addLast(dataPointZ);
+    dataPointsX.add(dataPointX);
+    dataPointsY.add(dataPointY);
+    dataPointsZ.add(dataPointZ);
   }
 
   /**
@@ -80,10 +80,6 @@ public class FragmentXYZ extends GraphFragment {
   @NonNull
   public static List<MyDataPoint> getPeakWindow() {
     synchronized (dataPointsZ) {
-      final int size = dataPointsZ.size();
-      if (size == 0) {
-        return new ArrayList<>();
-      }
       return Arrays.asList(toArray(dataPointsZ));
     }
   }
@@ -121,14 +117,10 @@ public class FragmentXYZ extends GraphFragment {
   }
 
   @NonNull
-  private synchronized static MyDataPoint[] toArray(CircularArray<MyDataPoint> circularArray) {
-    if (circularArray == null || circularArray.isEmpty()) {
+  private synchronized static MyDataPoint[] toArray(CircularFifoBuffer fifoBuffer) {
+    if (fifoBuffer == null || fifoBuffer.isEmpty()) {
       return new MyDataPoint[0];
     }
-    final MyDataPoint[] points = new MyDataPoint[circularArray.size()];
-    for (int i = 0; i < circularArray.size(); ++i) {
-      points[i] = circularArray.get(i);
-    }
-    return points;
+    return (MyDataPoint[]) fifoBuffer.toArray(new MyDataPoint[fifoBuffer.size()]);
   }
 }
