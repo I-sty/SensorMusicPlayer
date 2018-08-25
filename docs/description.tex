@@ -1,6 +1,8 @@
-\documentclass[12pt]{article}
+\documentclass[12pt, a4paper, portrait]{article}
 %Gummi|065|=)
 \usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage[utf8]{inputenc}
 \hypersetup{
   colorlinks=true,
   linkcolor=black,
@@ -9,6 +11,10 @@
 }
 \urlstyle{same}
 \title{\textbf{Sensor Music Player}}
+\author{István Szőllősi}
+
+
+\renewcommand{\baselinestretch}{1.5} 
 \begin{document}
 
 \maketitle
@@ -17,21 +23,38 @@
 \tableofcontents
 \newpage
 
+\section{About}
+The project is committed to the GitHub,you can see \href{}{here}.
+The main structure of the repository is
+\textit{a valid Android project} with several additionals folders, like the:
+\begin{itemize}
+\item{\textbf{backend}} folder where the \textit{Python} and \textit{JavaScript} codes are stored
+\item{\textbf{docs}} folder where the documents about the project are stored
+\end{itemize}
 \section{Node.js}
 In Node.js is very simple to create a small web server for REST calls.
 \subsection{Installation}
-\subsection{Add modules}
+\subsection{Configuration}
+Used tutorial: \href{https://www.codementor.io/olatundegaruba/nodejs-restful-apis-in-10-minutes-q0sgsfhbd}{Build Node.js RESTful APIs in 10 Minutes}
 \subsubsection{Mongoose}
 \subsubsection{Express}
 \subsubsection{Nodemon}
 
 \section{MongoDB}
-MongoDB to store data from Android application.
-
-\section{Configure Node.js server for REST calls}
-Configure routes, controllers, models.
+MongoDB to store signal data from the \textit{Y axis} of the accelerometer from the Android devices.
+\subsection{Drop collection}
+Code:
+show dbs
+use <db>
+show collections
+db.<collection>.drop()
 
 \section{Python PyPlot}
 \href{https://matplotlib.org/users/installing.html#linux-using-your-package-manager}{Install library from here}
+
+\section{Postman}
+Installed according to this article: \href{https://r00t4bl3.com/post/how-to-install-postman-native-app-in-linux-mint-18-3-sylvia}{How to install Postman native app in Linux Mint 18.3}
+
+Used to test the main functionalities of the Node.js server.
 
 \end{document}

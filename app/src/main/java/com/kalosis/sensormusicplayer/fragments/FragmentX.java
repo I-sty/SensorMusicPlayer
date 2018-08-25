@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,15 +16,16 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.kalosis.sensormusicplayer.R;
 import com.kalosis.sensormusicplayer.data.MyDataPoint;
+import com.kalosis.sensormusicplayer.utility.Utility;
 
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 
-public class FragmentX extends GraphFragment {
+public class FragmentX extends Fragment {
 
   private static final String TAG = FragmentX.class.getName();
 
   @NonNull
-  private static final CircularFifoBuffer dataPoints = new CircularFifoBuffer(CIRCULAR_BUFFER_SIZE);
+  private static final CircularFifoBuffer dataPoints = new CircularFifoBuffer(Utility.CIRCULAR_BUFFER_SIZE);
 
   private static final LineGraphSeries<MyDataPoint> series = new LineGraphSeries<>();
 
@@ -44,7 +46,7 @@ public class FragmentX extends GraphFragment {
         } catch (Exception e) {
           Log.e(TAG, "[refreshGraph] " + e);
         } finally {
-          mHandler.postDelayed(this, DELAY_REFRESH);
+          mHandler.postDelayed(this, Utility.DELAY_REFRESH);
         }
       }
     }
@@ -68,7 +70,7 @@ public class FragmentX extends GraphFragment {
     graphView.getGridLabelRenderer().setNumHorizontalLabels(5);
     graphView.getGridLabelRenderer().setNumVerticalLabels(5);
     mHandler = new Handler(Looper.myLooper());
-    mHandler.postDelayed(refreshGraph, DELAY_REFRESH);
+    mHandler.postDelayed(refreshGraph, Utility.DELAY_REFRESH);
     return rootView;
   }
 
