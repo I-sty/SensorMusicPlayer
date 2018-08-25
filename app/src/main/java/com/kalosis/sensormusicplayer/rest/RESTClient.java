@@ -31,7 +31,11 @@ public class RESTClient {
 
   private static final String RESPONSE_FAILED = "Response failed";
 
-  private static final String SERVER_ADDRESS = "193.231.162.22";
+  /**
+   * 193.231.162.22
+   * 192.168.0.4
+   */
+  private static final String SERVER_ADDRESS = "192.168.0.4";
 
   private static final short SERVER_PORT = 3000;
 
