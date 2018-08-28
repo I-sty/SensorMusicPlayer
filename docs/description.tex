@@ -9,7 +9,7 @@
   urlcolor=blue
 }
 \urlstyle{same}
-
+\usepackage{indentfirst}
 \usepackage{courier}
 \usepackage{listings}
 \usepackage{color}
@@ -88,6 +88,7 @@ Used tutorial: \href{https://www.codementor.io/olatundegaruba/nodejs-restful-api
 \pagebreak
 \section{MongoDB}
 MongoDB to store signal data from the \textit{Y axis} of the accelerometer from the Android devices.
+\subsection{Installation}
 \subsection{Drop collection}
 Code:
 \begin{lstlisting}[language=bash, caption=MongoDB shell commands to drop a collection]
@@ -99,7 +100,10 @@ db.<collection>.drop()
 
 \pagebreak
 \section{Matplotlib}
-Install module from \href{https://matplotlib.org/users/installing.html#linux-using-your-package-manager}{here}.
+Matplotlib is a plotting library for the Python programming language.
+I used \textit{matplotlib} to generate graphical view of my series.
+\subsection{Installation}
+Install module using this \href{https://matplotlib.org/users/installing.html#linux-using-your-package-manager}{tutorial}.
 \par Optionally, you need to install the \textbf{python-tk} package also.
 \subsection{Examples}
 According to this \href{https://matplotlib.org/users/pyplot_tutorial.html}{official tutorial} you can easily generate a plot about an array using this Python script:
@@ -113,7 +117,7 @@ plt.show()
 Result:
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=1.00]{Figure_2.png}
+\includegraphics[scale=0.87]{Figure_2.png}
 \caption{The result of the script}
 \end{figure}
 \clearpage
@@ -125,20 +129,70 @@ This example was very easy, so here is a \textit{normal} signal from the acceler
 \end{figure}
 
 \pagebreak
-\section{dtaidistance}
-\href{https://cs.fit.edu/~pkc/papers/tdm04.pdf}{FastDTW: Toward Accurate Dynamic Time Warping in Linear Time and Space}
-\par\href{https://github.com/wannesm/dtaidistance}{dtaidistance}
+\section{DTAIDistance}
+Library for time series distances (e.g. Dynamic Time Warping) used in the \href{https://dtai.cs.kuleuven.be/}{DTAI Research Group}.
+\par
+DTAIDistance official documentation: \href{https://dtaidistance.readthedocs.io/en/latest/index.html}{dtaidistance.readthedocs.io}
+\par Source available on \url{https://github.com/wannesm/dtaidistance}.
+
 \subsection{Installation}
-Run the follow codes in terminal:
-\begin{lstlisting}[language=bash]
-sudo apt install python3-pip python3-setuptools
-sudo apt-get install python3-dev
-sudo apt-get install python3-tk
+Run the follow codes in terminal to install the module:
+\begin{lstlisting}[language=bash, caption=Used Linux Mint 19]
+sudo apt install python3-pip python3-setuptools  python3-dev python3-tk
 pip3 install wheel
 pip3 install dtw
 pip3 install dtaidistance
-
 \end{lstlisting}
+
+\subsection{Usage}
+\begin{lstlisting}[language=Python, caption=Script to calculate DTW distance and plot warping paths matrix ]
+from dtaidistance import dtw
+from dtaidistance import dtw_visualisation as dtwvis
+import numpy as np
+
+s1 = np.array([0, 1, 2, 1, 0, 2, 1, 0, 0])
+s2 = np.array([0, 1, 2, 1, 0, 0, 1, 2, 1])
+
+d, matrix = dtw.warping_paths(s1, s2, window=25, psi=2)
+print('DTW distance = ', d)
+
+dtwvis.plot_warpingpaths(s1, s2, matrix, best_path, "image.png")
+\end{lstlisting}
+
+\clearpage
+The result will be put in the newly created \textbf{image.png} file.
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.60]{dtaidistance-sample.png}
+\caption{DTAIDistance's warping paths matrix}
+\label{}
+\end{figure}
+
+\subsection{Documentation}
+\begin{lstlisting}[language=Python]
+import numpy as np
+s1 = np.array([0, 1, 2, 1, 0, 2, 1, 0, 0])
+\end{lstlisting}
+\par\href{http://www.numpy.org/}{NumPy} is a library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays.
+\par The \textit{array()} function creates an array from a given list. See more details \href{https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html#numpy.array}{here}.
+\newline
+\begin{lstlisting}[language=Python]
+from dtaidistance import dtw
+d, matrix = dtw.warping_paths(s1, s2, window=25, psi=2)
+print('DTW distance = ', d)
+print('DTW matrix = ', matrix
+\end{lstlisting}
+
+\par The \textit{warping\_paths()} function calculates the DTW distance and the DTW matrix for the two given series. See more details
+\href{https://dtaidistance.readthedocs.io/en/latest/modules/dtw.html?highlight=warping_paths#dtaidistance.dtw.warping_paths}{here}.
+\newline
+
+\begin{lstlisting}[language=Python]
+from dtaidistance import dtw_visualisation as dtwvis
+dtwvis.plot_warpingpaths(s1, s2, matrix, best_path, "image.png")
+\end{lstlisting}
+\par The \textit{plot\_warpingpaths()} method plots the warping paths matrix into the \textit{image.png} file. See more details \href{https://dtaidistance.readthedocs.io/en/latest/modules/dtw_visualisation.html}{here}.
+
 
 \pagebreak
 \section{Postman}
