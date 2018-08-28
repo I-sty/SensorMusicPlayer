@@ -79,6 +79,11 @@ The project is committed to the GitHub, you can find \href{https://github.com/I-
 \section{Node.js}
 In Node.js is very simple to create a small web server for REST calls.
 \subsection{Installation}
+\subsection{Usage}
+To start use the follow command in the project's folder:
+\begin{lstlisting}[language=bash]
+npm run start
+\end{lstlisting}
 \subsection{Configuration}
 Used tutorial: \href{https://www.codementor.io/olatundegaruba/nodejs-restful-apis-in-10-minutes-q0sgsfhbd}{Build Node.js RESTful APIs in 10 Minutes}
 \subsubsection{Mongoose}
@@ -89,6 +94,12 @@ Used tutorial: \href{https://www.codementor.io/olatundegaruba/nodejs-restful-api
 \section{MongoDB}
 MongoDB to store signal data from the \textit{Y axis} of the accelerometer from the Android devices.
 \subsection{Installation}
+\subsection{Runing}
+To start mongo service use the follow command:
+\begin{lstlisting}[language=bash]
+sudo mongod --config /etc/mongodb.conf 
+\end{lstlisting}
+To access the mongo shell enter the \textit{mongod} command in terminal.
 \subsection{Drop collection}
 Code:
 \begin{lstlisting}[language=bash, caption=MongoDB shell commands to drop a collection]
@@ -239,4 +250,28 @@ curl -X POST http://localhost:3000/buffers  -d '{
 	"value":[-2.2, -1.1, 0, 1.1, 2.2]
 }'
 \end{lstlisting}
+
+\pagebreak
+\section{PyMongo}
+\subsection{Installation}
+\begin{lstlisting}[language=bash]
+pip3 install pymongo
+\end{lstlisting}
+Installing with pip: \url{http://api.mongodb.com/python/current/installation.html}
+\subsection{Usage}
+\begin{lstlisting}[language=Python]
+import pymongo
+from pymongo import MongoClient
+client = MongoClient('localhost', 27017)
+client.database_names()
+db = client['<db_name>']
+db.collection_names()
+coll = db['<collection_name>']
+
+for col in coll.find({}):
+    for keys in col.keys(): 
+        print ('{', keys, ":" , col[keys] , '}' )
+        
+\end{lstlisting}
+
 \end{document}
