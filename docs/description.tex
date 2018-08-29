@@ -253,6 +253,7 @@ curl -X POST http://localhost:3000/buffers  -d '{
 
 \pagebreak
 \section{PyMongo}
+Use \href{https://github.com/mongodb/mongo-python-driver}{PyMongo} if you want to get items from your MongoDB and want to parse in Python environment.
 \subsection{Installation}
 \begin{lstlisting}[language=bash]
 pip3 install pymongo
@@ -269,9 +270,58 @@ db.collection_names()
 coll = db['<collection_name>']
 
 for col in coll.find({}):
-    for keys in col.keys(): 
-        print ('{', keys, ":" , col[keys] , '}' )
+  for keys in col.keys(): 
+    if keys == "value":
+      print ('{', keys, ":" , col[keys] , '}' )
+    print('\n')
         
 \end{lstlisting}
+
+\pagebreak
+\section{PythonShell}
+Use \href{https://github.com/extrabacon/python-shell}{PythonShell} if you want to call a Python script in Node.js environment. For example when you receive a POST request in the Node.js server and you want to process your data using a Python script.
+\subsection{Installation}
+\begin{lstlisting}[language=bash]
+sudo npm install python-shell
+\end{lstlisting}
+\subsection{Usage}
+\begin{lstlisting}[language=Python]
+var PythonShell = require('python-shell');
+
+function callPythonMethod(req, res){
+  var options = {
+    mode: 'text',
+    pythonPath: 'python3', // or use the command
+    pythonOptions: ['-u'], // get print results in real-time
+    scriptPath: '<fullPathToTheFolder>/backend/python/',
+    args: [req]
+  };
+  PythonShell.run('<script>.py', options, function (err, results) {
+    if (err) res.send(err);
+    res.json(results);
+  });
+};
+\end{lstlisting}
+\subsection{Integrate into the project}
+You need to add these lines of code into the method where you create and save a new MongoDB item. The first step is to convert the input paramater a.k.a the body of the request to JSON object. From this JSON object you can get the array, convert to string and pass to the \textit{callPythonMethod()} as first parameter.
+\begin{lstlisting}[language=Java]
+exports.create_a_buffer = function(req, res) {
+  var new_buffer = new Buffer(req.body);
+  new_buffer.save(function(err, task) {
+    if (err) res.send(err);
+    //res.json(task);
+  });
+  
+  var stringify = JSON.stringify(req.body);
+  var body = JSON.parse(stringify);
+  callPythonMethod(body.value.toString(), res);
+};
+\end{lstlisting}
+\subsection{Demo}
+Using this module (\textit{PythonShell}) you easily can call a Python script from your Node.js server.
+\par Steps to present the non-Android part of the project:
+\begin{enumerate}
+\item{}
+\end{enumerate}
 
 \end{document}

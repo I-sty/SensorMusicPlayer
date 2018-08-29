@@ -1,51 +1,23 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-  Buffer = mongoose.model('Buffers'),
-  Task = mongoose.model('Tasks');
+  Buffer = mongoose.model('Buffers');
 
-// Tasks
-exports.list_all_tasks = function(req, res) {
-  Task.find({}, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
-};
+var PythonShell = require('python-shell');
 
-exports.create_a_task = function(req, res) {
-  var new_task = new Task(req.body);
-  new_task.save(function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
-};
-
-exports.read_a_task = function(req, res) {
-  Task.findById(req.params.taskId, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
-};
-
-exports.update_a_task = function(req, res) {
-  Task.findOneAndUpdate({_id: req.params.taskId}, req.body, {new: true}, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json(task);
-  });
-};
-
-exports.delete_a_task = function(req, res) {
-  
-  Task.remove({
-    _id: req.params.taskId
-  }, function(err, task) {
-    if (err)
-      res.send(err);
-    res.json({ message: 'Task successfully deleted' });
+function callPythonMethod(req, res){
+  var options = {
+    mode: 'text',
+    pythonPath: 'python3',
+    pythonOptions: ['-u'], // get print results in real-time
+    scriptPath: '/home/isti/StudioProjects/SensorMusicPlayer/backend/python/',
+    args: [req]
+  };
+  PythonShell.run('isti-distance.py', options, function (err, results) {
+    if (err) throw err;
+    // results is an array consisting of messages collected during execution
+    console.log(results);
+    res.json(results);
   });
 };
 
@@ -60,6 +32,10 @@ exports.list_all_buffers = function(req, res) {
 
 exports.create_a_buffer = function(req, res) {
   var new_buffer = new Buffer(req.body);
+  var stringify = JSON.stringify(req.body);
+  var body = JSON.parse(stringify);
+  var valami1 = body.value;
+  callPythonMethod(valami1.toString(), res);
   new_buffer.save(function(err, task) {
     if (err)
       res.send(err);
