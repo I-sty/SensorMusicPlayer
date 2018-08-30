@@ -96,6 +96,15 @@ public class FragmentXYZ extends Fragment {
     }
   }
 
+  /**
+   * Clears the peak window
+   */
+  public static void clearPeakWindow() {
+    synchronized (dataPointsZ) {
+      dataPointsZ.clear();
+    }
+  }
+
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,

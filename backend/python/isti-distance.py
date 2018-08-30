@@ -43,7 +43,7 @@ print(d)
 '''
 Compute the optimal path from the n*m warping paths matrix.
 '''
-best_path = dtw.best_path(matrix)
+#best_path = dtw.best_path(matrix)
 
 '''
 Plot the warping paths matrix.
@@ -56,4 +56,4 @@ path – Path to draw (typically this is the best path)
 filename – Filename for the image (optional)
 shownumbers – Show distances also as numbers
 '''
-dtwvis.plot_warpingpaths(s1, s2, matrix, best_path, "image.png")
+#dtwvis.plot_warpingpaths(s1, s2, matrix, best_path, "image.png")

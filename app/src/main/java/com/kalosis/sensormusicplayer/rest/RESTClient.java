@@ -1,5 +1,6 @@
 package com.kalosis.sensormusicplayer.rest;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import com.kalosis.sensormusicplayer.data.Buffer;
@@ -8,6 +9,8 @@ import com.kalosis.sensormusicplayer.rest.interfaces.GetBuffers;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -23,6 +26,8 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class RESTClient {
+  private static final byte DISTANCE_INVALID = -1;
+
   private static final String HTTP_PROTOCOL = "http://";
 
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -35,11 +40,11 @@ public class RESTClient {
    * 193.231.162.22
    * 192.168.0.4
    */
-  private static final String SERVER_ADDRESS = "192.168.0.4";
+  private static final String SERVER_ADDRESS = "192.168.10.64";
 
   private static final short SERVER_PORT = 3000;
 
-  private final OkHttpClient client = new OkHttpClient();
+  private static final OkHttpClient client = new OkHttpClient();
 
   private final Moshi moshi = new Moshi.Builder().build();
 
@@ -49,7 +54,7 @@ public class RESTClient {
 
   private final JsonAdapter<List<Buffer>> buffersAdapter = moshi.adapter(type);
 
-  public void createBuffer(Buffer bufferList, @NonNull CreateBuffer listener) {
+  public void createBuffer(Buffer bufferList, @NonNull Activity activity, @NonNull CreateBuffer listener) {
     RequestBody body = RequestBody.create(JSON, bufferAdapter.toJson(bufferList));
     Request request = new Request.Builder().url(getAbsoluteUrl("buffers")).post(body).build();
     client.newCall(request).enqueue(new Callback() {
@@ -61,7 +66,18 @@ public class RESTClient {
       @Override
       public void onResponse(Call call, Response response) {
         if (response.isSuccessful()) {
-          listener.onCreated();
+          ResponseBody body = response.body();
+          if (body == null) {
+            listener.onCreated(DISTANCE_INVALID);
+          } else {
+            try {
+              String message = body.string();
+              double distance = new JSONObject(message).getJSONArray("result").getDouble(0);
+              listener.onCreated(distance);
+            } catch (Exception e) {
+              listener.onError(RESPONSE_FAILED);
+            }
+          }
         } else {
           listener.onError(RESPONSE_FAILED);
         }
@@ -99,7 +115,14 @@ public class RESTClient {
     });
   }
 
-  private static String getAbsoluteUrl(@NonNull String buffers) {
-    return HTTP_PROTOCOL + SERVER_ADDRESS + ":" + SERVER_PORT + "/" + buffers;
+  /**
+   * Creates a full path to the give URL
+   *
+   * @param address The address of the page
+   *
+   * @return The FULL PATH of a page
+   */
+  private static String getAbsoluteUrl(@NonNull String address) {
+    return HTTP_PROTOCOL + SERVER_ADDRESS + ":" + SERVER_PORT + "/" + address;
   }
 }
