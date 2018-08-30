@@ -43,26 +43,7 @@ public class FragmentConfig extends PreferenceFragment {
 
   private View rootView;
 
-  private final View.OnClickListener analyzeClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      if (list.isEmpty()) {
-        Snackbar.make(rootView, R.string.label_empty_list, Snackbar.LENGTH_SHORT).show();
-        return;
-      }
-
-      int k = 0;
-
-      for (MyDataPoint myDataPoint : list) {
-        if (myDataPoint.getY() < THRESHOLD_ANALYZE) {
-          ++k;
-        }
-      }
-      int percentage = k * 100 / list.size();
-      Snackbar.make(rootView, String.format(Locale.getDefault(), "%d%% of the list is empty", percentage),
-          Snackbar.LENGTH_LONG).show();
-    }
-  };
+  private final View.OnClickListener analyzeClickListener = v -> analyzeList();
 
   private long startTime;
 
@@ -92,6 +73,7 @@ public class FragmentConfig extends PreferenceFragment {
         recordButton.setText(R.string.label_record);
         stopSendButton.removeCallbacks(writeTime);
         stopSendButton.setEnabled(true);
+        analyzeList();
       } else {
         FragmentXYZ.clearPeakWindow();
         startTime = Calendar.getInstance().getTimeInMillis();
@@ -141,5 +123,23 @@ public class FragmentConfig extends PreferenceFragment {
     Button analyzeButton = rootView.findViewById(R.id.fragmentConfigButtonAnalyze);
     analyzeButton.setOnClickListener(analyzeClickListener);
     return rootView;
+  }
+
+  private void analyzeList() {
+    if (list.isEmpty()) {
+      Snackbar.make(rootView, R.string.label_empty_list, Snackbar.LENGTH_SHORT).show();
+      return;
+    }
+
+    int k = 0;
+
+    for (MyDataPoint myDataPoint : list) {
+      if (myDataPoint.getY() < THRESHOLD_ANALYZE) {
+        ++k;
+      }
+    }
+    int percentage = k * 100 / list.size();
+    Snackbar.make(rootView, String.format(Locale.getDefault(), "%d%% of the list is empty", percentage),
+        Snackbar.LENGTH_LONG).show();
   }
 }

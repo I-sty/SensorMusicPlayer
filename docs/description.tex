@@ -67,6 +67,7 @@
 
 \renewcommand{\baselinestretch}{1.5} 
 \usepackage{graphicx}
+
 \begin{document}
 
 \maketitle
@@ -78,10 +79,19 @@
 \section{About}
 I would like to present how to gain values from an accelerometer and process that data on a separate server.\newline The scopes of the project:
 \begin{itemize}
-\item{main scope - make a music player that can be controllable by gestures}
+\item{main scope - make a music player that can be controlled with gestures}
 \item{understable and optimized signal processing (FastDTW, Dtaidistance, etc)}
 \item{easily buildable/usable server side (Node.js, Express.js, PythonShell)}
 \end{itemize}
+\par Listen to music can be a relaxing activity or source of motivation for some people. Many people always listen to music when he/she has possibility.
+Nowadays almost everybody use a smart device to listen to music.
+People listen to music in there cars, in there homes, in the office, on the bus/train almost in every places.
+\par To control the music player you need to touch the device at least once a time if you are in the car or if the screen of a smart device is open.
+But, if your music player device is in your pocket, you at first need to pull out, to unlock the screen, to open the music player app and for the last time to change your track.
+This is a long way to change a track and in some case it is hard to execute for example on a bus/train with many people.
+\par To resolve these problems we can use a music player which can be controlled with gestures. From this time we do not need to unlock everytime a smart device to change a track or we do not need to pull out from our pocket.
+We can easily change a track if the device is in our pocket by double tap the topside of the device.
+\par The player monitors the state changes of the accelerometer and with a help of a server can analyze in almost real-time what type of gesture is and what to do.
 \subsection{Technical about}
 \par The main structure of the repository is
 \textit{a valid Android project} with several additionals folders, like the:
