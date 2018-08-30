@@ -511,5 +511,6 @@ plt.plot([0,
             15.065587043762207,
             0.33812713623046875,
             -3.1235294342041016])
-plt.ylabel('some numbers')
+plt.ylabel('accelerometer value')
+plt.xlabel('sample numbers')
 plt.show()

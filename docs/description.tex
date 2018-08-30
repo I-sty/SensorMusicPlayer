@@ -41,6 +41,15 @@
 \usepackage{indentfirst}
 \usepackage[utf8]{inputenc}
 
+\usepackage{titlesec}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
 \usepackage{geometry}
 \geometry{
  a4paper,
@@ -67,18 +76,59 @@
 \newpage
 
 \section{About}
-The project is committed to the GitHub, you can find \href{https://github.com/I-sty/SensorMusicPlayer/}{here}.
+I would like to present how to gain values from an accelerometer and process that data on a separate server.\newline The scopes of the project:
+\begin{itemize}
+\item{main scope - make a music player that can be controllable by gestures}
+\item{understable and optimized signal processing (FastDTW, Dtaidistance, etc)}
+\item{easily buildable/usable server side (Node.js, Express.js, PythonShell)}
+\end{itemize}
+\subsection{Technical about}
 \par The main structure of the repository is
 \textit{a valid Android project} with several additionals folders, like the:
 \begin{itemize}
-\item{\textbf{backend}} folder where the \textit{Python} and \textit{JavaScript} codes are stored
+\item{\textbf{backend}} folder where the \textit{Python} and \textit{JavaScript} code is stored
 \item{\textbf{docs}} folder where the documents about the project are stored
 \end{itemize}
+\par Source code available: \url{https://github.com/I-sty/SensorMusicPlayer/}.
+\subsection{Workflow}
+\begin{enumerate}
+\item{Use the Android application to get the values from the accelerometer}
+\begin{enumerate}
+\item{Navigate to \textit{Config activity}}
+\item{Press the \textit{Record} button to start recording the accelerometer}
+\begin{itemize}
+\item{The text of the button will be changed to \textit{Stop}}
+\end{itemize}
+\item{Press the \textit{Stop} button to stop recording}
+\item{Press the \textit{Send} button to send the recorded signal to the Node.js server}
+\item{Optionally, you can "analyze" your recorded array by pressing the \textit{Analyze} button}
+\begin{itemize}
+\item{This feature checks your items in the array if they are greater than a predefined threshold.}
+\item{This feature eliminates the ability to send almost blank lists to the server}
+\end{itemize}
+\end{enumerate}
+\item{By pressing the \textit{Send} button in Android application, the application sends the recorded list to the server using a REST POST call.}
+\item{The Node.js server receives the request from the application and process it.}
+\begin{enumerate}
+\item{\textbf{REST API level} - The request arrives to the right URI path, that was registrated to receive request.}
+\item{\textbf{Controller level} - The \textit{REST API level} forwards the request to the right function of the controller.}
+\begin{enumerate}
+\item{The body of the request is forwarded to the \textit{Model level} to parse. The return object will be saved in MongoDB.}
+\item{The body of the request is forwarded to another function where the DTW's distance will be calculated using the PythonShell module.}
+\end{enumerate}
+\item{\textbf{Model level} - The body of the request will be interpreted as a \textit{Mongoose} object and returned to the \textit{Controller level} so it can be saved.}
+\end{enumerate}
+\item{The calculated distance will be send to the Android application as a respond for the POST request.}
+\end{enumerate}
+
 
 \pagebreak
 \section{Node.js}
 In Node.js is very simple to create a small web server for REST calls.
 \subsection{Installation}
+\begin{lstlisting}[language=bash]
+sudo apt install nodejs
+\end{lstlisting}
 \subsection{Usage}
 To start use the follow command in the project's folder:
 \begin{lstlisting}[language=bash]
@@ -87,21 +137,40 @@ npm run start
 \subsection{Configuration}
 Used tutorial: \href{https://www.codementor.io/olatundegaruba/nodejs-restful-apis-in-10-minutes-q0sgsfhbd}{Build Node.js RESTful APIs in 10 Minutes}
 \subsubsection{Mongoose}
+Mongoose is an Object Data Modeling (ODM) library for MongoDB and Node.js. It manages relationships between data, provides schema validation, and is used to translate between objects in code and the representation of those objects in MongoDB.
+\paragraph{Installation}
+\begin{lstlisting}[language=bash]
+npm install mongoose
+\end{lstlisting}
 \subsubsection{Express}
+Express.js, or simply Express, is a web application framework for Node.js. It is designed for building web applications and APIs
+\paragraph{Installation}
+\begin{lstlisting}[language=bash]
+npm install express --save
+\end{lstlisting}
 \subsubsection{Nodemon}
+\textit{nodemon} is a tool that helps develop node.js based applications by automatically restarting the node application when file changes in the directory are detected.
+\paragraph{Installation}
+\begin{lstlisting}[language=bash]
+npm install --save-dev nodemon
+\end{lstlisting}
 
 \pagebreak
 \section{MongoDB}
 MongoDB to store signal data from the \textit{Y axis} of the accelerometer from the Android devices.
 \subsection{Installation}
+\begin{lstlisting}[language=bash]
+sudo apt install mongodb
+\end{lstlisting}
 \subsection{Runing}
 To start mongo service use the follow command:
 \begin{lstlisting}[language=bash]
 sudo mongod --config /etc/mongodb.conf 
 \end{lstlisting}
-To access the mongo shell enter the \textit{mongod} command in terminal.
-\subsection{Drop collection}
-Code:
+\subsection{Drop a collection}
+In some cases you need to drop collections, for example when the collections contains random test cases what were introduced during the development process.
+\par To drop/clear a collection introduce the following codes, in the Mongo's shell.
+\par To access the Mongo's shell enter the \textit{mongod} command in terminal.
 \begin{lstlisting}[language=bash, caption=MongoDB shell commands to drop a collection]
 show dbs
 use <db>
@@ -128,7 +197,7 @@ plt.show()
 Result:
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=0.87]{Figure_2.png}
+\includegraphics[scale=0.83]{Figure_2.png}
 \caption{The result of the script}
 \end{figure}
 \clearpage
@@ -317,11 +386,5 @@ exports.create_a_buffer = function(req, res) {
   callPythonMethod(body.value.toString(), res);
 };
 \end{lstlisting}
-\subsection{Demo}
-Using this module (\textit{PythonShell}) you easily can call a Python script from your Node.js server.
-\par Steps to present the non-Android part of the project:
-\begin{enumerate}
-\item{}
-\end{enumerate}
 
 \end{document}
