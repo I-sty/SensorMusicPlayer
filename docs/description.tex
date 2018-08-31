@@ -180,7 +180,7 @@ sudo mongod --config /etc/mongodb.conf
 \subsection{Drop a collection}
 In some cases you need to drop collections, for example when the collections contains random test cases what were introduced during the development process.
 \par To drop/clear a collection introduce the following codes, in the Mongo's shell.
-\par To access the Mongo's shell enter the \textit{mongod} command in terminal.
+\par To access the Mongo's shell enter the \textit{mongo} command in terminal.
 \begin{lstlisting}[language=bash, caption=MongoDB shell commands to drop a collection]
 show dbs
 use <db>
@@ -395,6 +395,38 @@ exports.create_a_buffer = function(req, res) {
   var body = JSON.parse(stringify);
   callPythonMethod(body.value.toString(), res);
 };
+\end{lstlisting}
+
+\pagebreak
+\section{Plot everything}
+This is a short Python script that plots every item in the MongoDB to a separate \textit{png} file.
+\begin{lstlisting}[language=Python]
+import pymongo
+import os
+import shutil
+import matplotlib.pyplot as plt
+from pymongo import MongoClient
+
+client = MongoClient('localhost', 27017)
+print('Databases: ', client.database_names())
+db = client['Tododb']
+print('Collections: ', db.collection_names())
+coll = db['buffers']
+
+dir = 'asimage'
+if not os.path.exists(dir):
+    os.makedirs(dir)
+else:
+    shutil.rmtree(dir)
+    os.makedirs(dir)
+os.chdir(dir)
+
+for col in coll.find({}):
+  plt.plot(col["value"])
+  plt.ylabel('accelerometer value')
+  plt.xlabel('sample numbers')
+  plt.savefig(str(col["_id"]))
+  plt.gcf().clear()
 \end{lstlisting}
 
 \end{document}

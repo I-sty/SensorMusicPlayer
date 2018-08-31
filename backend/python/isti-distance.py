@@ -1,7 +1,77 @@
-from dtaidistance import dtw
-from dtaidistance import dtw_visualisation as dtwvis
 import numpy as np
 import sys
+from dtaidistance import dtw
+from pymongo import MongoClient
+
+'''
+matrix - The matrix with the items
+index - Which column need to check
+rows - The number of rows
+'''
+
+
+def calcMinimum(matrix, index, rows):
+    # print('\ncalcMinimum: ', matrix , ' ', index, ' ', rows)
+    minimum = 8
+    minIndex = -1
+    for x in range(0, rows):
+        if matrix[x][index] < minimum:
+            minimum = matrix[x][index]
+            minIndex = x
+    if (minIndex != -1):
+        matrix[minIndex][1] += 1
+
+
+def getShapeId(matrix, rows):
+    # print('\ngetShapeId: ', matrix , ' ', rows)
+    minimum = 1000
+    minIndex = -1
+    for x in range(0, rows):
+        if matrix[x][1] < minimum:
+            minimum = matrix[x][1]
+            minIndex = x
+    # print('minIndex')
+    # print(minIndex)
+    if (minIndex > -1 and minimum > 0):
+        return matrix[minIndex][0]
+    else:
+        return '0'
+
+
+client = MongoClient('localhost', 27017)
+# print('Databases: ', client.database_names())
+db = client['Tododb']
+# print('Collections: ', db.collection_names())
+coll = db['shapes']
+colls = coll.find({})
+size = colls.count()
+
+# Create a matrix to store results
+n = 6
+# shape_type | winner |  x  |  y  |  z  | sum
+#  circle (1)|    1   |     |     | min | 
+#  circle (1)|    2   |     | min |     | min
+#  circle (1)|    1   | min |     |     | 
+#  square (2)|    0   |     |     |     | 
+#  square (2)|    0   |     |     |     | 
+#  square (2)|    0   |     |     |     | 
+
+matrix = [0] * size
+for i in range(size):
+    matrix[i] = [0] * n
+
+k = 0
+
+for col in coll.find({}):
+    if (col["shape"] == "circle"):
+        matrix[k][0] = 1
+    elif (col["shape"] == "square"):
+        matrix[k][0] = 2
+    k += 1
+
+# print('\n\nempty matrix: ', matrix)
+
+k = 0
 
 '''
 Create an array.
@@ -13,8 +83,28 @@ object : An array, any object exposing the array interface, an object whose __ar
 Returns:
 An array object satisfying the specified requirements.
 '''
-s1 = np.array([0, 1, 2, 1, 0, 2, 1, 0, 0])
-s2 = np.fromstring(sys.argv[1], dtype=float, sep=',')
+x2 = np.fromstring(sys.argv[1], dtype=float, sep=',')
+y2 = np.fromstring(sys.argv[2], dtype=float, sep=',')
+z2 = np.fromstring(sys.argv[3], dtype=float, sep=',')
+
+for col in coll.find({}):
+    x1 = np.array(col["x"])
+    y1 = np.array(col["y"])
+    z1 = np.array(col["z"])
+    dx, matrixX = dtw.warping_paths(x1, x2, window=25, psi=2)
+    dy, matrixY = dtw.warping_paths(y1, y2, window=25, psi=2)
+    dz, matrixZ = dtw.warping_paths(z1, z2, window=25, psi=2)
+    matrix[k][2] = dx
+    matrix[k][3] = dy
+    matrix[k][4] = dz
+    matrix[k][5] = dx + dy + dz
+    k += 1
+
+for i in range(2, 6):
+    calcMinimum(matrix, i, size)
+
+# print('\n\ncalculated matrix: \n', matrix)
+print(getShapeId(matrix, size))
 
 '''
 Dynamic Time Warping.
@@ -35,9 +125,13 @@ psi – Psi relaxation parameter (ignore start and end of matching). Useful for 
 Returns:	
 (DTW distance, DTW matrix)
 '''
-d, matrix = dtw.warping_paths(s1, s2, window=25, psi=2)
+# dx, matrixX = dtw.warping_paths(x1, x2, window=25, psi=2)
+# dy, matrixY = dtw.warping_paths(y1, y2, window=25, psi=2)
+#dz, matrixZ = dtw.warping_paths(z1, z2, window=25, psi=2)
 #print('DTW distance = ', d)
-print(d)
+# print(dx)
+# print(dy)
+#print(dz)
 #print('DTW matrix = ', matrix)
 
 '''

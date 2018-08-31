@@ -18,4 +18,5 @@
     <string name="label_stop">Stop</string>
     <string name="label_analyze">Analyze</string>
     <string name="label_empty_list">List is empty</string>
+    <string name="label_not_recognized_shape">Can not recognized shapes</string>
 </resources>

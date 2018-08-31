@@ -15,8 +15,10 @@ import android.widget.TextView;
 import com.kalosis.sensormusicplayer.R;
 import com.kalosis.sensormusicplayer.data.Buffer;
 import com.kalosis.sensormusicplayer.data.MyDataPoint;
+import com.kalosis.sensormusicplayer.data.Shape;
 import com.kalosis.sensormusicplayer.rest.RESTClient;
 import com.kalosis.sensormusicplayer.rest.interfaces.CreateBuffer;
+import com.kalosis.sensormusicplayer.utility.FragmentXYZUtility;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -33,8 +35,6 @@ public class FragmentConfig extends PreferenceFragment {
 
   private TextView elapsedTime;
 
-  private List<MyDataPoint> list = Collections.emptyList();
-
   private Button recordButton;
 
   private TextView recordItems;
@@ -43,17 +43,25 @@ public class FragmentConfig extends PreferenceFragment {
 
   private View rootView;
 
-  private final View.OnClickListener analyzeClickListener = v -> analyzeList();
-
   private long startTime;
 
   private Button stopSendButton;
 
+  private List<MyDataPoint> x = Collections.emptyList();
+
+  private final View.OnClickListener analyzeClickListener = v -> analyzeList();
+
+  private List<MyDataPoint> y = Collections.emptyList();
+
+  private List<MyDataPoint> z = Collections.emptyList();
+
   private final Runnable writeTime = new Runnable() {
     @Override
     public void run() {
-      list = FragmentXYZ.getPeakWindow();
-      recordItems.setText(String.valueOf(list.size()));
+      x = FragmentXYZUtility.getInstance().getPeakWindowX();
+      y = FragmentXYZUtility.getInstance().getPeakWindowY();
+      z = FragmentXYZUtility.getInstance().getPeakWindowZ();
+      recordItems.setText(String.valueOf(x.size()));
       long diff = Calendar.getInstance().getTimeInMillis() - startTime;
       String format = String.format(Locale.getDefault(), "%%0%dd", 2);
       diff = diff / 1000;
@@ -68,14 +76,16 @@ public class FragmentConfig extends PreferenceFragment {
     @Override
     public void onClick(View v) {
       if (recordButton.getText().equals(v.getContext().getString(R.string.label_stop))) {
-        list = FragmentXYZ.getPeakWindow();
-        recordItems.setText(String.valueOf(list.size()));
+        x = FragmentXYZUtility.getInstance().getPeakWindowX();
+        y = FragmentXYZUtility.getInstance().getPeakWindowY();
+        z = FragmentXYZUtility.getInstance().getPeakWindowZ();
+        recordItems.setText(String.valueOf(x.size()));
         recordButton.setText(R.string.label_record);
         stopSendButton.removeCallbacks(writeTime);
         stopSendButton.setEnabled(true);
         analyzeList();
       } else {
-        FragmentXYZ.clearPeakWindow();
+        FragmentXYZUtility.getInstance().clearPeakWindows();
         startTime = Calendar.getInstance().getTimeInMillis();
         stopSendButton.postDelayed(writeTime, DELAY_WRITE_TIME);
         recordButton.setText(R.string.label_stop);
@@ -89,12 +99,17 @@ public class FragmentConfig extends PreferenceFragment {
     public void onClick(View v) {
       stopSendButton.setEnabled(false);
       stopSendButton.removeCallbacks(writeTime);
-      restClient.createBuffer(new Buffer(list), getActivity(), new CreateBuffer() {
+      restClient.createBuffer(new Buffer(x, y, z), new CreateBuffer() {
         @Override
-        public void onCreated(double distance) {
-          stopSendButton.post(() -> Snackbar.make(rootView,
-              stopSendButton.getContext().getString(R.string.label_buffer_created) + "\nDistance: " + distance,
-              Snackbar.LENGTH_SHORT).show());
+        public void onCreated(@Nullable Shape shape) {
+          stopSendButton.post(() -> {
+            if (shape == null) {
+              Snackbar.make(rootView, stopSendButton.getContext().getString(R.string.label_not_recognized_shape),
+                  Snackbar.LENGTH_LONG).show();
+            } else {
+              Snackbar.make(rootView, shape.toString(), Snackbar.LENGTH_LONG).show();
+            }
+          });
         }
 
         @Override
@@ -126,19 +141,19 @@ public class FragmentConfig extends PreferenceFragment {
   }
 
   private void analyzeList() {
-    if (list.isEmpty()) {
+    if (x.isEmpty()) {
       Snackbar.make(rootView, R.string.label_empty_list, Snackbar.LENGTH_SHORT).show();
       return;
     }
 
     int k = 0;
 
-    for (MyDataPoint myDataPoint : list) {
-      if (myDataPoint.getY() < THRESHOLD_ANALYZE) {
+    for (MyDataPoint myDataPoint : x) {
+      if (Math.abs(myDataPoint.getY()) < THRESHOLD_ANALYZE) {
         ++k;
       }
     }
-    int percentage = k * 100 / list.size();
+    int percentage = k * 100 / x.size();
     Snackbar.make(rootView, String.format(Locale.getDefault(), "%d%% of the list is empty", percentage),
         Snackbar.LENGTH_LONG).show();
   }

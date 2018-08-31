@@ -10,4 +10,9 @@ module.exports = function(app) {
     .get(todoList.read_a_buffer)
     .put(todoList.update_a_buffer)
     .delete(todoList.delete_a_buffer);
+
+  app.route('/shapes')
+    .get(todoList.list_all_shapes)
+    .post(todoList.create_a_shape);
+
 };

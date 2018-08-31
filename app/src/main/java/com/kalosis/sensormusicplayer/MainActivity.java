@@ -5,49 +5,22 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.kalosis.sensormusicplayer.data.MyDataPoint;
-import com.kalosis.sensormusicplayer.fragments.FragmentXYZ;
-
-import java.util.List;
+import com.kalosis.sensormusicplayer.utility.FragmentXYZUtility;
 
 public class MainActivity extends AppCompatActivity {
 
-  /** Delay to start peak calculation */
-  private static final short DELAY_CALC_PEAK = 2000;
-
   /** Delay before the sensor recording start */
-  private static final short DELAY_RECORD_SENSOR = 600;
+  private static final short DELAY_RECORD_SENSOR = 500;
 
-  private static final int PEAK_THRESHOLD = 7;
-
-  private static final String TAG = MainActivity.class.getName();
-
-  private Handler mHandler;
-
-  private final Runnable calcPeak = new Runnable() {
-
-    @Override
-    public void run() {
-      final List<MyDataPoint> list = FragmentXYZ.getPeakWindow();
-      if (list.size() == 0) {
-        Log.d(TAG, "[calcPeak] empty list");
-        mHandler.postDelayed(this, DELAY_CALC_PEAK);
-        return;
-      }
-      mHandler.postDelayed(this, DELAY_CALC_PEAK);
-    }
-  };
 
   private Sensor mSensor;
 
@@ -94,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    FragmentXYZUtility.getInstance().destroy();
+  }
+
+  @Override
   protected void onPause() {
     super.onPause();
     if (mSensorManager != null) {
@@ -109,12 +88,8 @@ public class MainActivity extends AppCompatActivity {
       if (mSensorManager != null) {
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(PlaceholderFragment.getAccelerometerEventListener(), mSensor,
-            SensorManager.SENSOR_DELAY_GAME);
+            SensorManager.SENSOR_DELAY_FASTEST);
       }
     }, DELAY_RECORD_SENSOR);
-
-    mHandler = new Handler(Looper.myLooper());
-    mHandler.postDelayed(calcPeak, DELAY_CALC_PEAK);
   }
-
 }

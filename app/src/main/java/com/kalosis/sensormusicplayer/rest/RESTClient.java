@@ -1,15 +1,16 @@
 package com.kalosis.sensormusicplayer.rest;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
 
 import com.kalosis.sensormusicplayer.data.Buffer;
+import com.kalosis.sensormusicplayer.data.Shape;
 import com.kalosis.sensormusicplayer.rest.interfaces.CreateBuffer;
 import com.kalosis.sensormusicplayer.rest.interfaces.GetBuffers;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -26,8 +27,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public class RESTClient {
-  private static final byte DISTANCE_INVALID = -1;
-
   private static final String HTTP_PROTOCOL = "http://";
 
   private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -54,7 +53,7 @@ public class RESTClient {
 
   private final JsonAdapter<List<Buffer>> buffersAdapter = moshi.adapter(type);
 
-  public void createBuffer(Buffer bufferList, @NonNull Activity activity, @NonNull CreateBuffer listener) {
+  public void createBuffer(Buffer bufferList, @NonNull CreateBuffer listener) {
     RequestBody body = RequestBody.create(JSON, bufferAdapter.toJson(bufferList));
     Request request = new Request.Builder().url(getAbsoluteUrl("buffers")).post(body).build();
     client.newCall(request).enqueue(new Callback() {
@@ -68,12 +67,12 @@ public class RESTClient {
         if (response.isSuccessful()) {
           ResponseBody body = response.body();
           if (body == null) {
-            listener.onCreated(DISTANCE_INVALID);
+            listener.onCreated(null);
           } else {
             try {
               String message = body.string();
-              double distance = new JSONObject(message).getJSONArray("result").getDouble(0);
-              listener.onCreated(distance);
+              JSONArray jsonArray = new JSONObject(message).getJSONArray("result");
+              listener.onCreated(Shape.value(jsonArray.getInt(0)));
             } catch (Exception e) {
               listener.onError(RESPONSE_FAILED);
             }

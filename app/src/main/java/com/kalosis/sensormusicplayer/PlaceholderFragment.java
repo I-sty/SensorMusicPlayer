@@ -18,6 +18,7 @@ import com.kalosis.sensormusicplayer.fragments.FragmentX;
 import com.kalosis.sensormusicplayer.fragments.FragmentXYZ;
 import com.kalosis.sensormusicplayer.fragments.FragmentY;
 import com.kalosis.sensormusicplayer.fragments.FragmentZ;
+import com.kalosis.sensormusicplayer.utility.FragmentXYZUtility;
 
 import static com.kalosis.sensormusicplayer.controller.Section.SECTION_XYZ;
 
@@ -81,7 +82,11 @@ public class PlaceholderFragment extends Fragment {
       }
       case SECTION_XYZ: {
         FragmentXYZ fragmentXYZ = new FragmentXYZ();
-        return fragmentXYZ.onCreateView(inflater, container, savedInstanceState);
+        FragmentXYZUtility fragmentXYZUtility = FragmentXYZUtility.getInstance();
+        View fragment = fragmentXYZ.onCreateView(inflater, container, savedInstanceState);
+        fragmentXYZUtility.setFragment(fragmentXYZ, inflater.getContext());
+        fragmentXYZUtility.setHandler();
+        return fragment;
       }
       case SECTION_CONFIG: {
         FragmentConfig fragmentConfig = new FragmentConfig();
@@ -132,7 +137,7 @@ public class PlaceholderFragment extends Fragment {
           FragmentY.appendData(dataPointY);
           MyDataPoint dataPointZ = new MyDataPoint(counter.getCounter(), formatRawValue(event.values[2] - gravity[2]));
           FragmentZ.appendData(dataPointZ);
-          FragmentXYZ.appendData(dataPointX, dataPointY, dataPointZ);
+          FragmentXYZUtility.getInstance().appendData(dataPointX, dataPointY, dataPointZ);
           counter.increment();
         }
       }
@@ -147,6 +152,7 @@ public class PlaceholderFragment extends Fragment {
    * @return The value if it is bigger than a threshold or zero.
    */
   private static double formatRawValue(float v) {
-    return Math.abs(v) < THRESHOLD ? 0f : v;
+    //return Math.abs(v) < THRESHOLD ? 0f : v;
+    return v;
   }
 }

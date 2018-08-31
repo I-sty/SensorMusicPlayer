@@ -1,17 +1,18 @@
 'use strict';
 
 var mongoose = require('mongoose'),
+  Shape = mongoose.model('Shapes'),
   Buffer = mongoose.model('Buffers');
 
 var PythonShell = require('python-shell');
 
-function callPythonMethod(req, res){
+function callPythonMethod(x, y, z, res){
   var options = {
     mode: 'text',
     pythonPath: 'python3',
     pythonOptions: ['-u'], // get print results in real-time
     scriptPath: '/home/isti/StudioProjects/SensorMusicPlayer/backend/python/',
-    args: [req]
+    args: [x, y, z]
   };
   PythonShell.run('isti-distance.py', options, function (err, results) {
     if (err) throw err;
@@ -39,7 +40,8 @@ exports.create_a_buffer = function(req, res) {
   });
   var stringify = JSON.stringify(req.body);
   var body = JSON.parse(stringify);
-  callPythonMethod(body.value.toString(), res);
+  //console.log('body = ', body);
+  callPythonMethod(body.x.toString(), body.y.toString(), body.z.toString(), res);
 };
 
 exports.read_a_buffer = function(req, res) {
@@ -69,3 +71,23 @@ exports.delete_a_buffer = function(req, res) {
     res.json({ message: 'Buffer successfully deleted' });
   });
 };
+
+// Shapes
+
+exports.create_a_shape = function(req, res) {
+  var new_shape = new Shape(req.body);
+  new_shape.save(function(err, task) {
+    if (err)
+      res.send(err);
+    res.json(task);
+  });
+};
+
+exports.list_all_shapes = function(req, res) {
+  Shape.find({}, function(err, task) {
+    if (err)
+      res.send(err);
+    res.json(task);
+  });
+};
+
