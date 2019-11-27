@@ -1,30 +1,30 @@
-package com.kalosis.sensormusicplayer.fragments;
+package com.szollosi.sensormusicplayer.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.kalosis.sensormusicplayer.R;
-import com.kalosis.sensormusicplayer.data.MyDataPoint;
-import com.kalosis.sensormusicplayer.utility.Utility;
+import com.szollosi.sensormusicplayer.MyDataPoint;
+import com.szollosi.sensormusicplayer.R;
 
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
+import java.util.ArrayList;
 
-public class FragmentZ extends Fragment {
+public class FragmentZ extends GraphFragment {
 
   private static final String TAG = FragmentZ.class.getName();
 
   @NonNull
-  private static final CircularFifoBuffer dataPoints = new CircularFifoBuffer(Utility.CIRCULAR_BUFFER_SIZE);
+  private static final ArrayList<MyDataPoint> dataPoints = new ArrayList<>();
 
   private static final LineGraphSeries<MyDataPoint> series = new LineGraphSeries<>();
 
@@ -32,23 +32,31 @@ public class FragmentZ extends Fragment {
 
   private Handler mHandler;
 
-  private final Runnable refreshGraph = new Runnable() {
+  private Runnable refreshGraph = new Runnable() {
     @Override
     public void run() {
       synchronized (dataPoints) {
-        series.resetData((MyDataPoint[]) dataPoints.toArray(new MyDataPoint[dataPoints.size()]));
+        series.resetData(dataPoints.toArray(new MyDataPoint[dataPoints.size()]));
         graphView.getViewport().setMinX(series.getLowestValueX());
         graphView.getViewport().setMaxX(series.getHighestValueX());
         graphView.getViewport().scrollToEnd();
-        mHandler.postDelayed(this, Utility.DELAY_REFRESH);
+        mHandler.postDelayed(this, DELAY_REFRESH);
       }
     }
   };
 
-  public static void appendData(@NonNull MyDataPoint dataPoint) {
-    synchronized (dataPoints) {
-      dataPoints.add(dataPoint);
+  public static void appendData(MyDataPoint dataPoint) {
+    if (dataPoint == null) {
+      return;
     }
+    AsyncTask.execute(() -> {
+      synchronized (dataPoints) {
+        if (dataPoints.size() >= MAX_DATA_POINTS) {
+          dataPoints.remove(0);
+        }
+        dataPoints.add(dataPoint);
+      }
+    });
   }
 
   @Nullable
@@ -63,7 +71,7 @@ public class FragmentZ extends Fragment {
     graphView.getGridLabelRenderer().setNumHorizontalLabels(5);
     graphView.getGridLabelRenderer().setNumVerticalLabels(5);
     mHandler = new Handler(Looper.myLooper());
-    mHandler.postDelayed(refreshGraph, Utility.DELAY_REFRESH);
+    mHandler.postDelayed(refreshGraph, DELAY_REFRESH);
     return rootView;
   }
 
@@ -71,12 +79,5 @@ public class FragmentZ extends Fragment {
   public void onPause() {
     super.onPause();
     mHandler.removeCallbacks(refreshGraph);
-    dataPoints.clear();
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-    dataPoints.clear();
   }
 }

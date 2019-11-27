@@ -1,26 +1,24 @@
-package com.kalosis.sensormusicplayer;
+package com.szollosi.sensormusicplayer;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.kalosis.sensormusicplayer.controller.Section;
-import com.kalosis.sensormusicplayer.data.MyDataPoint;
-import com.kalosis.sensormusicplayer.fragments.FragmentConfig;
-import com.kalosis.sensormusicplayer.fragments.FragmentX;
-import com.kalosis.sensormusicplayer.fragments.FragmentXYZ;
-import com.kalosis.sensormusicplayer.fragments.FragmentY;
-import com.kalosis.sensormusicplayer.fragments.FragmentZ;
-import com.kalosis.sensormusicplayer.utility.FragmentXYZUtility;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-import static com.kalosis.sensormusicplayer.controller.Section.SECTION_XYZ;
+import com.szollosi.sensormusicplayer.controller.Section;
+import com.szollosi.sensormusicplayer.fragments.FragmentX;
+import com.szollosi.sensormusicplayer.fragments.FragmentXYZ;
+import com.szollosi.sensormusicplayer.fragments.FragmentY;
+import com.szollosi.sensormusicplayer.fragments.FragmentZ;
+
+import static com.szollosi.sensormusicplayer.controller.Section.SECTION_XYZ;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -33,7 +31,6 @@ public class PlaceholderFragment extends Fragment {
    */
   private static final String ARG_SECTION_NUMBER = "section_number";
 
-  /** Threshold to avoid unnecessary data, example small moves of the hand */
   private static final float THRESHOLD = 0.3f;
 
   @Nullable
@@ -41,7 +38,7 @@ public class PlaceholderFragment extends Fragment {
 
   private final Counter counter = new Counter();
 
-  private final float[] gravity = new float[3];
+  private float[] gravity = new float[3];
 
   public PlaceholderFragment() {
   }
@@ -64,9 +61,11 @@ public class PlaceholderFragment extends Fragment {
   }
 
   @Override
-  public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+  public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+      Bundle savedInstanceState) {
     final Section sectionNumber =
-        getArguments() != null ? Section.values()[getArguments().getInt(ARG_SECTION_NUMBER) - 1] : SECTION_XYZ;
+        getArguments() != null ? Section.values()[getArguments().getInt(ARG_SECTION_NUMBER) - 1] :
+            SECTION_XYZ;
     switch (sectionNumber) {
       case SECTION_Y: {
         FragmentY fragmentY = new FragmentY();
@@ -82,17 +81,12 @@ public class PlaceholderFragment extends Fragment {
       }
       case SECTION_XYZ: {
         FragmentXYZ fragmentXYZ = new FragmentXYZ();
-        FragmentXYZUtility fragmentXYZUtility = FragmentXYZUtility.getInstance();
-        View fragment = fragmentXYZ.onCreateView(inflater, container, savedInstanceState);
-        fragmentXYZUtility.setFragment(fragmentXYZ, inflater.getContext());
-        fragmentXYZUtility.setHandler();
-        return fragment;
+        return fragmentXYZ.onCreateView(inflater, container, savedInstanceState);
       }
       case SECTION_CONFIG: {
-        FragmentConfig fragmentConfig = new FragmentConfig();
-        //        fragmentConfig.onCreate(savedInstanceState);
-        //        return fragmentConfig.getView();
-        return fragmentConfig.onCreateView(inflater, container, savedInstanceState);
+//        FragmentConfig fragmentConfig = new FragmentConfig();
+//        fragmentConfig.onCreate(savedInstanceState);
+//        return fragmentConfig.getView();
       }
       default: {
         return null;
@@ -131,28 +125,23 @@ public class PlaceholderFragment extends Fragment {
           gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
           // Remove the gravity contribution with the high-pass filter.
-          MyDataPoint dataPointX = new MyDataPoint(counter.getCounter(), formatRawValue(event.values[0] - gravity[0]));
+          MyDataPoint dataPointX =
+              new MyDataPoint(counter.getCounter(), initYValue(event.values[0] - gravity[0]));
           FragmentX.appendData(dataPointX);
-          MyDataPoint dataPointY = new MyDataPoint(counter.getCounter(), formatRawValue(event.values[1] - gravity[1]));
+          MyDataPoint dataPointY =
+              new MyDataPoint(counter.getCounter(), initYValue(event.values[1] - gravity[1]));
           FragmentY.appendData(dataPointY);
-          MyDataPoint dataPointZ = new MyDataPoint(counter.getCounter(), formatRawValue(event.values[2] - gravity[2]));
+          MyDataPoint dataPointZ =
+              new MyDataPoint(counter.getCounter(), initYValue(event.values[2] - gravity[2]));
           FragmentZ.appendData(dataPointZ);
-          FragmentXYZUtility.getInstance().appendData(dataPointX, dataPointY, dataPointZ);
+          FragmentXYZ.appendData(dataPointX, dataPointY, dataPointZ);
           counter.increment();
         }
       }
     };
   }
 
-  /**
-   * Format the raw data.
-   *
-   * @param v The value
-   *
-   * @return The value if it is bigger than a threshold or zero.
-   */
-  private static double formatRawValue(float v) {
-    //return Math.abs(v) < THRESHOLD ? 0f : v;
-    return v;
+  private double initYValue(float v) {
+    return Math.abs(v) < THRESHOLD ? 0f : v;
   }
 }

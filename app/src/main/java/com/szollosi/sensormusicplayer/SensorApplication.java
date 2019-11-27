@@ -1,4 +1,4 @@
-package com.kalosis.sensormusicplayer;
+package com.szollosi.sensormusicplayer;
 
 import android.app.Application;
 
