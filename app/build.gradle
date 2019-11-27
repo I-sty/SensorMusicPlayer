@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 29
     defaultConfig {
-        applicationId "com.kalosis.sensormusicplayer"
+        applicationId "com.szollosi.sensormusicplayer"
         minSdkVersion 22
-        targetSdkVersion 27
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
     }
@@ -22,14 +22,16 @@ android {
 }
 
 dependencies {
+    //android
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'com.jjoe64:graphview:4.2.2'
-    implementation 'com.android.support:design:27.1.1'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
-    implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
-    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
-    implementation 'com.squareup.moshi:moshi:1.6.0'
+    implementation "androidx.appcompat:appcompat:$rootProject.ext.appcompat"
+    implementation "androidx.constraintlayout:constraintlayout:$rootProject.ext.constraint"
+    implementation "com.google.android.material:material:$rootProject.ext.material"
+
+    //testing
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$rootProject.ext.leakcanary"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leakcanary"
+
+    //tools
+    implementation "com.github.PhilJay:MPAndroidChart:$rootProject.ext.chart"
 }
