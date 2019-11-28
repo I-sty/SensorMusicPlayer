@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import com.github.mikephil.charting.data.Entry;
 import com.google.android.material.tabs.TabLayout;
 import com.szollosi.sensormusicplayer.fragments.FragmentXYZ;
 
@@ -27,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
   private static final short DELAY_CALC_PEAK = 1200;
 
   private static final int PEAK_THRESHOLD = 7;
+
+  public static final int DELAY_MILLIS = 600;
 
   private String TAG = MainActivity.class.getName();
 
@@ -41,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void run() {
-      final ArrayList<MyDataPoint> list =
+      final ArrayList<Entry> list =
           new ArrayList<>(FragmentXYZ.getPeakWindow());
       if (list.isEmpty()) {
         mHandler.postDelayed(this, DELAY_CALC_PEAK);
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
           return 0;
         }
       });
-      DataPoint peakPoint = list.get(0);
+      Entry peakPoint = list.get(0);
       Log.d(TAG, "[run] \nstart: " + list.get(0) + "\nend: " + list.get(list.size() - 1) +
           "\npeak: " + peakPoint);
 
@@ -132,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             .registerListener(PlaceholderFragment.getAccelerometerEventListener(), mSensor,
                 SensorManager.SENSOR_DELAY_NORMAL);
       }
-    }, 600);
+    }, DELAY_MILLIS);
 
 //    JobInfo.Builder builder =
 //        new JobInfo.Builder(1, new ComponentName(getPackageName(), PeakCalculator.class.getName()));

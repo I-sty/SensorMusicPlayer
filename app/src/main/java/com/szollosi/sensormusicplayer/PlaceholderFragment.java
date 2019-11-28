@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.github.mikephil.charting.data.Entry;
 import com.szollosi.sensormusicplayer.controller.Section;
 import com.szollosi.sensormusicplayer.fragments.FragmentX;
 import com.szollosi.sensormusicplayer.fragments.FragmentXYZ;
@@ -125,14 +126,14 @@ public class PlaceholderFragment extends Fragment {
           gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
           // Remove the gravity contribution with the high-pass filter.
-          MyDataPoint dataPointX =
-              new MyDataPoint(counter.getCounter(), initYValue(event.values[0] - gravity[0]));
+          Entry dataPointX =
+              new Entry(counter.getCounter(), initYValue(event.values[0] - gravity[0]));
           FragmentX.appendData(dataPointX);
-          MyDataPoint dataPointY =
-              new MyDataPoint(counter.getCounter(), initYValue(event.values[1] - gravity[1]));
+          Entry dataPointY =
+              new Entry(counter.getCounter(), initYValue(event.values[1] - gravity[1]));
           FragmentY.appendData(dataPointY);
-          MyDataPoint dataPointZ =
-              new MyDataPoint(counter.getCounter(), initYValue(event.values[2] - gravity[2]));
+          Entry dataPointZ =
+              new Entry(counter.getCounter(), initYValue(event.values[2] - gravity[2]));
           FragmentZ.appendData(dataPointZ);
           FragmentXYZ.appendData(dataPointX, dataPointY, dataPointZ);
           counter.increment();
@@ -141,7 +142,7 @@ public class PlaceholderFragment extends Fragment {
     };
   }
 
-  private double initYValue(float v) {
+  private float initYValue(float v) {
     return Math.abs(v) < THRESHOLD ? 0f : v;
   }
 }

@@ -4,8 +4,7 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.util.Log;
 
-import com.jjoe64.graphview.series.DataPoint;
-import com.szollosi.sensormusicplayer.MyDataPoint;
+import com.github.mikephil.charting.data.Entry;
 import com.szollosi.sensormusicplayer.fragments.FragmentXYZ;
 
 import java.util.Collections;
@@ -20,8 +19,8 @@ public class PeakCalculator extends JobService {
   @Override
   public boolean onStartJob(JobParameters params) {
     Log.i(TAG, "[onStartJob]");
-    List<MyDataPoint> list = FragmentXYZ.getPeakWindow();
-    if (list.size() == 0) {
+    List<Entry> list = FragmentXYZ.getPeakWindow();
+    if (list.isEmpty()) {
       jobFinished(params, true);
       return true;
     }
@@ -34,7 +33,7 @@ public class PeakCalculator extends JobService {
         return 0;
       }
     });
-    DataPoint peakPoint = list.get(0);
+    Entry peakPoint = list.get(0);
     Log.e(TAG, "[onStartJob] \nstart: " + list.get(0) + "\nend: " + list.get(list.size() - 1) + "\npeak: " + peakPoint);
 
     //check if the peak is higher then a threshold
