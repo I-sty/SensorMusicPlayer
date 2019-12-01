@@ -27,13 +27,14 @@ public class FragmentZ extends GraphFragment {
   @NonNull
   private static final ArrayList<Entry> dataPoints = new ArrayList<>();
 
-  private static LineDataSet series;
+  private static LineDataSet series = new LineDataSet(dataPoints, "series z");
 
   private LineChart graphView;
 
   private Handler mHandler;
 
   private Runnable refreshGraph = new Runnable() {
+
     @Override
     public void run() {
       synchronized (dataPoints) {

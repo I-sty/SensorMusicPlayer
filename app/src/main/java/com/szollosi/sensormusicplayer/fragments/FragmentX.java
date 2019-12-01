@@ -25,7 +25,7 @@ public class FragmentX extends GraphFragment {
   @NonNull
   private static final ArrayList<Entry> dataPoints = new ArrayList<>();
 
-  private static LineDataSet series;
+  private static LineDataSet series = new LineDataSet(dataPoints, "f");
 
   private LineChart graphView;
 
@@ -50,7 +50,7 @@ public class FragmentX extends GraphFragment {
    * size.
    *
    * @param dataPoint
-   *     *     The element to append.
+   *  The element to append.
    */
   public static synchronized void appendData(@NonNull Entry dataPoint) {
     dataPoints.add(dataPoint);
@@ -71,6 +71,7 @@ public class FragmentX extends GraphFragment {
     graphView = rootView.findViewById(R.id.graph_x);
     graphView.setData(new LineData(series));
     series.setColor(ContextCompat.getColor(inflater.getContext(), R.color.colorAxeX));
+    graphView.invalidate();
 //    graphView.getViewport().setXAxisBoundsManual(true);
 //    graphView.getGridLabelRenderer().setNumHorizontalLabels(5);
 //    graphView.getGridLabelRenderer().setNumVerticalLabels(5);

@@ -25,7 +25,7 @@ import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
 
-  private static final short DELAY_CALC_PEAK = 1200;
+  private static final short DELAY_CALC_PEAK = 1500;
 
   private static final int PEAK_THRESHOLD = 7;
 

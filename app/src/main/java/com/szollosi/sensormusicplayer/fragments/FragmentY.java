@@ -27,7 +27,7 @@ public class FragmentY extends GraphFragment {
   @NonNull
   private static final ArrayList<Entry> dataPoints = new ArrayList<>();
 
-  private static LineDataSet series;
+  private static LineDataSet series = new LineDataSet(dataPoints, "series Y");
 
   private Handler mHandler;
 

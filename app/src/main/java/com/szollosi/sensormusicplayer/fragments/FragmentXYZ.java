@@ -3,13 +3,13 @@ package com.szollosi.sensormusicplayer.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -33,11 +33,13 @@ public class FragmentXYZ extends GraphFragment {
   @NonNull
   private static final List<Entry> dataPointsZ = new ArrayList<>();
 
-  private static LineDataSet seriesX;
+  private static LineDataSet seriesX = new LineDataSet(dataPointsX, "x");
 
-  private static LineDataSet seriesY;
+  private static LineDataSet seriesY = new LineDataSet(dataPointsY, "y");
 
-  private static LineDataSet seriesZ;
+  private static LineDataSet seriesZ = new LineDataSet(dataPointsZ, "z");
+
+  private LineChart graphView;
 
   private Handler mHandler;
 
@@ -55,6 +57,7 @@ public class FragmentXYZ extends GraphFragment {
         seriesX = new LineDataSet(dataPointsX, seriesXName);
         seriesY = new LineDataSet(dataPointsY, seriesYName);
         seriesZ = new LineDataSet(dataPointsZ, seriesZName);
+        graphView.invalidate();
 //        graphView.getViewport().setMinX(seriesX.getLowestValueX());
 //        graphView.getViewport().setMaxX(seriesX.getHighestValueX());
 //        graphView.getViewport().scrollToEnd();
@@ -65,9 +68,9 @@ public class FragmentXYZ extends GraphFragment {
 
   public static void appendData(@NonNull Entry dataPointX, @NonNull Entry dataPointY,
       @NonNull Entry dataPointZ) {
-    addItemToList(dataPointsX, dataPointX);
-    addItemToList(dataPointsY, dataPointY);
-    addItemToList(dataPointsZ, dataPointZ);
+//    addItemToList(dataPointsX, dataPointX);
+//    addItemToList(dataPointsY, dataPointY);
+//    addItemToList(dataPointsZ, dataPointZ);
   }
 
   private static synchronized void addItemToList(@NonNull final Collection<Entry> list,
@@ -85,14 +88,10 @@ public class FragmentXYZ extends GraphFragment {
   public static List<Entry> getPeakWindow() {
     synchronized (dataPointsZ) {
       final int size = dataPointsZ.size();
-      final byte LIST_SIZE = 50;
       if (size == 0) {
         return new ArrayList<>();
       }
-      if (size < LIST_SIZE) {
-        return dataPointsZ.subList(0, size);
-      }
-      return dataPointsZ.subList(size - LIST_SIZE, size);
+      return dataPointsZ.subList(0, size);
     }
   }
 
@@ -107,20 +106,21 @@ public class FragmentXYZ extends GraphFragment {
 
     View rootView = inflater.inflate(R.layout.fragment_section_xyz, container, false);
 
-    LineChart graphView = rootView.findViewById(R.id.graph_xyz);
+    graphView = rootView.findViewById(R.id.graph_xyz);
     graphView.setData(new LineData(seriesX));
-//    seriesX.setColor(ContextCompat.getColor(context, R.color.colorAxeX));
+    seriesX.setColor(ContextCompat.getColor(context, R.color.colorAxeX));
     graphView.setData(new LineData(seriesY));
-//    seriesY.setColor(ContextCompat.getColor(context, R.color.colorAxeY));
+    seriesY.setColor(ContextCompat.getColor(context, R.color.colorAxeY));
     graphView.setData(new LineData(seriesZ));
-//    seriesZ.setColor(ContextCompat.getColor(context, R.color.colorAxeZ));
+    seriesZ.setColor(ContextCompat.getColor(context, R.color.colorAxeZ));
 //    graphView.getViewport().setXAxisBoundsManual(true);
 //    graphView.getGridLabelRenderer().setNumHorizontalLabels(5);
 //    graphView.getGridLabelRenderer().setNumVerticalLabels(8);
 //    graphView.getLegendRenderer().setVisible(true);
 //    graphView.getLegendRenderer().setAlign(LegendRenderer);
-    mHandler = new Handler(Looper.myLooper());
-    mHandler.postDelayed(refreshGraph, DELAY_REFRESH);
+    graphView.invalidate();
+//    mHandler = new Handler(Looper.myLooper());
+//    mHandler.postDelayed(refreshGraph, DELAY_REFRESH);
     return rootView;
   }
 
