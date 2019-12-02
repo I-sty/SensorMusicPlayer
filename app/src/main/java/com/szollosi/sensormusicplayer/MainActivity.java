@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 //      Log.e(TAG, "onCreate: Some error while scheduling the job");
 //    }
     mHandler = new Handler(Looper.myLooper());
-    mHandler.postDelayed(calcPeak, DELAY_CALC_PEAK);
+//    mHandler.postDelayed(calcPeak, DELAY_CALC_PEAK);
   }
 
 }

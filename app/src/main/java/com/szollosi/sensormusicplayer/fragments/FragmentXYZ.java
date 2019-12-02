@@ -25,7 +25,7 @@ import java.util.List;
 public class FragmentXYZ extends GraphFragment {
 
   @NonNull
-  private static final List<Entry> dataPointsX = new ArrayList<>();
+  private static List<Entry> dataPointsX = new ArrayList<>();
 
   @NonNull
   private static final List<Entry> dataPointsY = new ArrayList<>();
@@ -39,7 +39,7 @@ public class FragmentXYZ extends GraphFragment {
 
   private static LineDataSet seriesZ = new LineDataSet(dataPointsZ, "z");
 
-  private LineChart graphView;
+  private LineChart chart;
 
   private Handler mHandler;
 
@@ -57,10 +57,10 @@ public class FragmentXYZ extends GraphFragment {
         seriesX = new LineDataSet(dataPointsX, seriesXName);
         seriesY = new LineDataSet(dataPointsY, seriesYName);
         seriesZ = new LineDataSet(dataPointsZ, seriesZName);
-        graphView.invalidate();
-//        graphView.getViewport().setMinX(seriesX.getLowestValueX());
-//        graphView.getViewport().setMaxX(seriesX.getHighestValueX());
-//        graphView.getViewport().scrollToEnd();
+        chart.invalidate();
+//        chart.getViewport().setMinX(seriesX.getLowestValueX());
+//        chart.getViewport().setMaxX(seriesX.getHighestValueX());
+//        chart.getViewport().scrollToEnd();
         mHandler.postDelayed(this, DELAY_REFRESH);
       }
     }
@@ -75,24 +75,25 @@ public class FragmentXYZ extends GraphFragment {
 
   private static synchronized void addItemToList(@NonNull final Collection<Entry> list,
       @NonNull Entry item) {
-    list.add(item);
-    if (list.size() >= MAX_DATA_POINTS) {
-      Iterator<Entry> iterator = list.iterator();
-      if (iterator.hasNext()) {
-        iterator.next();
-        iterator.remove();
-      }
-    }
+//    list.add(item);
+//    if (list.size() >= MAX_DATA_POINTS) {
+//      Iterator<Entry> iterator = list.iterator();
+//      if (iterator.hasNext()) {
+//        iterator.next();
+//        iterator.remove();
+//      }
+//    }
   }
 
   public static List<Entry> getPeakWindow() {
-    synchronized (dataPointsZ) {
-      final int size = dataPointsZ.size();
-      if (size == 0) {
-        return new ArrayList<>();
-      }
-      return dataPointsZ.subList(0, size);
-    }
+//    synchronized (dataPointsZ) {
+//      final int size = dataPointsZ.size();
+//      if (size == 0) {
+//        return new ArrayList<>();
+//      }
+//      return dataPointsZ.subList(0, size);
+//    }
+    return null;
   }
 
   @Nullable
@@ -106,27 +107,37 @@ public class FragmentXYZ extends GraphFragment {
 
     View rootView = inflater.inflate(R.layout.fragment_section_xyz, container, false);
 
-    graphView = rootView.findViewById(R.id.graph_xyz);
-    graphView.setData(new LineData(seriesX));
+    dataPointsX = new ArrayList<>();
+    for(int i = 0; i < 10; ++i){
+      dataPointsX.add(new Entry(i, i*i));
+      dataPointsY.add(new Entry(i, i*i*i));
+      dataPointsZ.add(new Entry(i, i*2));
+    }
+    seriesX = new LineDataSet(dataPointsX, seriesXName);
+    seriesY = new LineDataSet(dataPointsY, seriesYName);
+    seriesZ = new LineDataSet(dataPointsZ, seriesZName);
+
+    chart = rootView.findViewById(R.id.graph_xyz);
+    chart.setData(new LineData(seriesX, seriesY, seriesZ));
     seriesX.setColor(ContextCompat.getColor(context, R.color.colorAxeX));
-    graphView.setData(new LineData(seriesY));
-    seriesY.setColor(ContextCompat.getColor(context, R.color.colorAxeY));
-    graphView.setData(new LineData(seriesZ));
-    seriesZ.setColor(ContextCompat.getColor(context, R.color.colorAxeZ));
-//    graphView.getViewport().setXAxisBoundsManual(true);
-//    graphView.getGridLabelRenderer().setNumHorizontalLabels(5);
-//    graphView.getGridLabelRenderer().setNumVerticalLabels(8);
-//    graphView.getLegendRenderer().setVisible(true);
-//    graphView.getLegendRenderer().setAlign(LegendRenderer);
-    graphView.invalidate();
+//    chart.setData(new LineData(seriesY));
+//    seriesY.setColor(ContextCompat.getColor(context, R.color.colorAxeY));
+//    chart.setData(new LineData(seriesZ));
+//    seriesZ.setColor(ContextCompat.getColor(context, R.color.colorAxeZ));
+//    chart.getViewport().setXAxisBoundsManual(true);
+//    chart.getGridLabelRenderer().setNumHorizontalLabels(5);
+//    chart.getGridLabelRenderer().setNumVerticalLabels(8);
+//    chart.getLegendRenderer().setVisible(true);
+//    chart.getLegendRenderer().setAlign(LegendRenderer);
+    chart.invalidate();
 //    mHandler = new Handler(Looper.myLooper());
 //    mHandler.postDelayed(refreshGraph, DELAY_REFRESH);
     return rootView;
   }
 
-  @Override
-  public void onPause() {
-    super.onPause();
-    mHandler.removeCallbacks(refreshGraph);
-  }
+//  @Override
+//  public void onPause() {
+//    super.onPause();
+//    mHandler.removeCallbacks(refreshGraph);
+//  }
 }

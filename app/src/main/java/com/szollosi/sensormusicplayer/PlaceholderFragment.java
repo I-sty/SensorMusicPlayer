@@ -65,7 +65,7 @@ public class PlaceholderFragment extends Fragment {
   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
     final Section sectionNumber =
-        getArguments() != null ? Section.values()[getArguments().getInt(ARG_SECTION_NUMBER) - 1] :
+        getArguments() != null ? Section.values()[getArguments().getInt(ARG_SECTION_NUMBER)] :
             SECTION_XYZ;
     switch (sectionNumber) {
       case SECTION_Y: {
@@ -126,17 +126,17 @@ public class PlaceholderFragment extends Fragment {
           gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
           // Remove the gravity contribution with the high-pass filter.
-          Entry dataPointX =
-              new Entry(counter.getCounter(), initYValue(event.values[0] - gravity[0]));
-          FragmentX.appendData(dataPointX);
-          Entry dataPointY =
-              new Entry(counter.getCounter(), initYValue(event.values[1] - gravity[1]));
-          FragmentY.appendData(dataPointY);
-          Entry dataPointZ =
-              new Entry(counter.getCounter(), initYValue(event.values[2] - gravity[2]));
-          FragmentZ.appendData(dataPointZ);
-          FragmentXYZ.appendData(dataPointX, dataPointY, dataPointZ);
-          counter.increment();
+//          Entry dataPointX =
+//              new Entry(counter.getCounter(), initYValue(event.values[0] - gravity[0]));
+//          FragmentX.appendData(dataPointX);
+//          Entry dataPointY =
+//              new Entry(counter.getCounter(), initYValue(event.values[1] - gravity[1]));
+//          FragmentY.appendData(dataPointY);
+//          Entry dataPointZ =
+//              new Entry(counter.getCounter(), initYValue(event.values[2] - gravity[2]));
+//          FragmentZ.appendData(dataPointZ);
+//          FragmentXYZ.appendData(dataPointX, dataPointY, dataPointZ);
+//          counter.increment();
         }
       }
     };
