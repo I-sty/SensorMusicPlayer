@@ -4,7 +4,7 @@ public class Counter {
 
   private long counter;
 
-  Counter() {
+  public Counter() {
     this.counter = 0;
   }
 

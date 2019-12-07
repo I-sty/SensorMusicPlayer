@@ -2,34 +2,24 @@ package com.szollosi.sensormusicplayer;
 
 import android.content.Context;
 import android.hardware.Sensor;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
-import com.github.mikephil.charting.data.Entry;
 import com.google.android.material.tabs.TabLayout;
-import com.szollosi.sensormusicplayer.fragments.FragmentXYZ;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import com.szollosi.sensormusicplayer.fragments.BaseFragment;
+import com.szollosi.sensormusicplayer.util.SensorListener;
 
 public class MainActivity extends AppCompatActivity {
-
-  private static final short DELAY_CALC_PEAK = 1500;
-
-  private static final int PEAK_THRESHOLD = 7;
-
-  public static final int DELAY_MILLIS = 600;
 
   private String TAG = MainActivity.class.getName();
 
@@ -38,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
   @Nullable
   private SensorManager mSensorManager;
 
-  private Handler mHandler;
+  /*private Handler mHandler;*/
 
-  private Runnable calcPeak = new Runnable() {
+/*  private Runnable calcPeak = new Runnable() {
 
     @Override
     public void run() {
@@ -72,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
       }
       mHandler.postDelayed(this, DELAY_CALC_PEAK);
     }
-  };
+  };*/
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -95,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
+  private SensorEventListener accelerometerListener = new SensorListener();
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -102,15 +94,39 @@ public class MainActivity extends AppCompatActivity {
 
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
+
+    BaseFragment.init(this);
+
     SectionsPagerAdapter mSectionsPagerAdapter =
         new SectionsPagerAdapter(getSupportFragmentManager());
     ViewPager mViewPager = findViewById(R.id.container);
     mViewPager.setAdapter(mSectionsPagerAdapter);
 
     TabLayout tabLayout = findViewById(R.id.tabs);
+    tabLayout.setupWithViewPager(mViewPager);
 
     mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-    tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+      @Override
+      public void onTabSelected(TabLayout.Tab tab) {
+//        mViewPager.setCurrentItem(tab.getPosition());
+        Log.i(TAG, "[onTabSelected]");
+      }
+
+      @Override
+      public void onTabUnselected(TabLayout.Tab tab) {
+        Log.i(TAG, "[onTabUnselected]");
+
+//        mSectionsPagerAdapter.getRegisteredFragment(mViewPager.getCurrentItem());
+
+      }
+
+      @Override
+      public void onTabReselected(TabLayout.Tab tab) {
+        Log.i(TAG, "[onTabReselected]");
+      }
+    });
 
     //mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
   }
@@ -119,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
   protected void onPause() {
     super.onPause();
     if (mSensorManager != null) {
-      mSensorManager.unregisterListener(PlaceholderFragment.getAccelerometerEventListener());
+      mSensorManager.unregisterListener(accelerometerListener);
     }
   }
 
@@ -132,10 +148,11 @@ public class MainActivity extends AppCompatActivity {
       if (mSensorManager != null) {
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager
-            .registerListener(PlaceholderFragment.getAccelerometerEventListener(), mSensor,
+            .registerListener(accelerometerListener, mSensor,
                 SensorManager.SENSOR_DELAY_NORMAL);
       }
-    }, DELAY_MILLIS);
+    }, Constants.DELAY_TO_LISTEN_SENSOR);
+
 
 //    JobInfo.Builder builder =
 //        new JobInfo.Builder(1, new ComponentName(getPackageName(), PeakCalculator.class.getName()));
@@ -146,8 +163,13 @@ public class MainActivity extends AppCompatActivity {
 //    if (mJobScheduler.schedule(builder.build()) <= 0) {
 //      Log.e(TAG, "onCreate: Some error while scheduling the job");
 //    }
-    mHandler = new Handler(Looper.myLooper());
+//    mHandler = new Handler(Looper.myLooper());
 //    mHandler.postDelayed(calcPeak, DELAY_CALC_PEAK);
   }
 
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    accelerometerListener = null;
+  }
 }

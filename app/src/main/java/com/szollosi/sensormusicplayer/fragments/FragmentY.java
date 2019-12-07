@@ -1,6 +1,5 @@
 package com.szollosi.sensormusicplayer.fragments;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,52 +9,42 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
+import com.szollosi.sensormusicplayer.Constants;
 import com.szollosi.sensormusicplayer.R;
 
-import java.util.ArrayList;
-
-public class FragmentY extends GraphFragment {
-
-  private static final String TAG = FragmentY.class.getName();
-
-  @NonNull
-  private static final ArrayList<Entry> dataPoints = new ArrayList<>();
-
-  private static LineDataSet series = new LineDataSet(dataPoints, "series Y");
+public class FragmentY extends BaseFragment {
 
   private Handler mHandler;
 
+  private LineChart chart;
+
   private Runnable refreshGraph = new Runnable() {
+
     @Override
     public void run() {
-      synchronized (dataPoints) {
-        series = new LineDataSet(dataPoints, "f");
-//        graphView.getViewport().setMinX(series.getLowestValueX());
-//        graphView.getViewport().setMaxX(series.getHighestValueX());
-//        graphView.getViewport().scrollToEnd();
-        mHandler.postDelayed(this, DELAY_REFRESH);
+      synchronized (dataPointsY) {
+        seriesY.setValues(dataPointsY);
+        chart.setData(new LineData(seriesY));
+        chart.invalidate();
+        mHandler.postDelayed(this, Constants.DELAY_REFRESH);
       }
     }
   };
 
-  public static void appendData(Entry dataPoint) {
-    if (dataPoint == null) {
-      return;
-    }
-    AsyncTask.execute(() -> {
-      synchronized (dataPoints) {
-        if (dataPoints.size() >= MAX_DATA_POINTS) {
-          dataPoints.remove(0);
-        }
-        dataPoints.add(dataPoint);
-      }
-    });
+  private int page;
+
+  private String title;
+
+  public static FragmentY newInstance(int page, String title) {
+    FragmentY fragmentFirst = new FragmentY();
+    Bundle args = new Bundle();
+    args.putInt("someInt", page);
+    args.putString("someTitle", title);
+    fragmentFirst.setArguments(args);
+    return fragmentFirst;
   }
 
   @Nullable
@@ -63,14 +52,7 @@ public class FragmentY extends GraphFragment {
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.fragment_section_y, container, false);
-    LineChart graphView = rootView.findViewById(R.id.graph_y);
-    graphView.setData(new LineData(series));
-    series.setColor(ContextCompat.getColor(inflater.getContext(), R.color.colorAxeY));
-//    graphView.getViewport().setXAxisBoundsManual(true);
-//    graphView.getGridLabelRenderer().setNumHorizontalLabels(5);
-//    graphView.getGridLabelRenderer().setNumVerticalLabels(5);
-    mHandler = new Handler(Looper.myLooper());
-    mHandler.postDelayed(refreshGraph, DELAY_REFRESH);
+    chart = rootView.findViewById(R.id.graph_y);
     return rootView;
   }
 
@@ -78,5 +60,19 @@ public class FragmentY extends GraphFragment {
   public void onPause() {
     super.onPause();
     mHandler.removeCallbacks(refreshGraph);
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    mHandler = new Handler(Looper.myLooper());
+    mHandler.postDelayed(refreshGraph, Constants.DELAY_REFRESH);
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    page = getArguments().getInt("someInt", 0);
+    title = getArguments().getString("someTitle");
   }
 }

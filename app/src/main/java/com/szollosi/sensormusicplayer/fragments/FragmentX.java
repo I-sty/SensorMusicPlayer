@@ -9,58 +9,42 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
+import com.szollosi.sensormusicplayer.Constants;
 import com.szollosi.sensormusicplayer.R;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-public class FragmentX extends GraphFragment {
-
-  @NonNull
-  private static final ArrayList<Entry> dataPoints = new ArrayList<>();
-
-  private static LineDataSet series = new LineDataSet(dataPoints, "f");
-
-  private LineChart graphView;
+public class FragmentX extends BaseFragment {
 
   private Handler mHandler;
+
+  private LineChart chart;
 
   private Runnable refreshGraph = new Runnable() {
 
     @Override
     public void run() {
-      synchronized (dataPoints) {
-        series = new LineDataSet(dataPoints, "f");
-//        graphView.getViewport().setMinX(series.getLowestValueX());
-//        graphView.getViewport().setMaxX(series.getHighestValueX());
-//        graphView.getViewport().scrollToEnd();
-        mHandler.postDelayed(this, DELAY_REFRESH);
+      synchronized (dataPointsX) {
+        seriesY.setValues(dataPointsX);
+        chart.setData(new LineData(seriesX));
+        chart.invalidate();
+        mHandler.postDelayed(this, Constants.DELAY_REFRESH);
       }
     }
   };
 
-  /**
-   * Appends the specified element to the end of this list and remove the first element if the list exceeded the preset
-   * size.
-   *
-   * @param dataPoint
-   *  The element to append.
-   */
-  public static synchronized void appendData(@NonNull Entry dataPoint) {
-    dataPoints.add(dataPoint);
-    synchronized (dataPoints) {
-      if (dataPoints.size() >= MAX_DATA_POINTS) {
-        Iterator<Entry> iterator = dataPoints.iterator();
-        iterator.next();
-        iterator.remove();
-      }
-    }
+  private int page;
+
+  private String title;
+
+  public static FragmentX newInstance(int page, String title) {
+    FragmentX fragmentFirst = new FragmentX();
+    Bundle args = new Bundle();
+    args.putInt("someInt", page);
+    args.putString("someTitle", title);
+    fragmentFirst.setArguments(args);
+    return fragmentFirst;
   }
 
   @Nullable
@@ -68,21 +52,27 @@ public class FragmentX extends GraphFragment {
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.fragment_section_x, container, false);
-    graphView = rootView.findViewById(R.id.graph_x);
-    graphView.setData(new LineData(series));
-    series.setColor(ContextCompat.getColor(inflater.getContext(), R.color.colorAxeX));
-    graphView.invalidate();
-//    graphView.getViewport().setXAxisBoundsManual(true);
-//    graphView.getGridLabelRenderer().setNumHorizontalLabels(5);
-//    graphView.getGridLabelRenderer().setNumVerticalLabels(5);
-    mHandler = new Handler(Looper.myLooper());
-    mHandler.postDelayed(refreshGraph, DELAY_REFRESH);
+    chart = rootView.findViewById(R.id.graph_x);
     return rootView;
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    mHandler = new Handler(Looper.myLooper());
+    mHandler.postDelayed(refreshGraph, Constants.DELAY_REFRESH);
   }
 
   @Override
   public void onPause() {
     super.onPause();
     mHandler.removeCallbacks(refreshGraph);
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    page = getArguments().getInt("someInt", 0);
+    title = getArguments().getString("someTitle");
   }
 }
