@@ -1,10 +1,10 @@
-package com.szollosi.sensormusicplayer;
+package com.szollosi.sensormusicplayer
 
-import android.app.Application;
+import android.app.Application
 
-import com.squareup.leakcanary.LeakCanary;
+import leakcanary.LeakCanary
 
-public class SensorApplication extends Application {
+class SensorApplication : Application() {
   /**
    * Called when the application is starting, before any activity, service,
    * or receiver objects (excluding content providers) have been created.
@@ -14,14 +14,13 @@ public class SensorApplication extends Application {
    * service, or receiver in a process.
    * If you override this method, be sure to call super.onCreate().
    */
-  @Override
-  public void onCreate() {
-    super.onCreate();
+  override fun onCreate() {
+    super.onCreate()
     if (LeakCanary.isInAnalyzerProcess(this)) {
       // This process is dedicated to LeakCanary for heap analysis.
       // You should not init your app in this process.
-      return;
+      return
     }
-    LeakCanary.install(this);
+    LeakCanary.install(this)
   }
 }
