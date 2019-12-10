@@ -52,5 +52,3 @@ class SectionsPagerAdapter internal constructor(fm: FragmentManager) : FragmentS
 //  override fun getPageTitle(position: Int): CharSequence? {
 //    return "Page $position"
 //  }
-
-}

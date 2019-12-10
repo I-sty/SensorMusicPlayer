@@ -12,11 +12,11 @@ import java.util.*
 abstract class BaseFragment : Fragment() {
   companion object {
 
-    val dataPointsY: List<Entry> = ArrayList()
+    val dataPointsY: ArrayList<Entry> = ArrayList()
 
-    val dataPointsZ: List<Entry> = ArrayList()
+    val dataPointsZ: ArrayList<Entry> = ArrayList()
 
-    val dataPointsX: List<Entry> = ArrayList()
+    val dataPointsX: ArrayList<Entry> = ArrayList()
 
     private val TAG = BaseFragment::class.java.simpleName
 

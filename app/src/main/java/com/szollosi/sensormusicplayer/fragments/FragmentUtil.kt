@@ -2,7 +2,7 @@ package com.szollosi.sensormusicplayer.fragments
 
 import com.github.mikephil.charting.data.Entry
 import com.szollosi.sensormusicplayer.Constants
-import java.util.*
+import kotlin.collections.ArrayList
 
 object FragmentUtil {
 
@@ -15,10 +15,10 @@ object FragmentUtil {
    * @param item The element to append.
    */
   @Synchronized
-  fun addItemToList(list: MutableList<Entry>,
+  fun addItemToList(list: ArrayList<Entry>,
                     item: Entry) {
     if (list.size >= Constants.MAX_DATA_POINTS) {
-      list.removeAt(0)
+      list.drop(1)
     }
     list.add(item)
   }
