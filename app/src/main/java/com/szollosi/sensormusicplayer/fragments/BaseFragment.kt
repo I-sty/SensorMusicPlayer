@@ -2,21 +2,21 @@ package com.szollosi.sensormusicplayer.fragments
 
 import android.content.Context
 import android.util.Log
+import androidx.collection.CircularArray
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import com.szollosi.sensormusicplayer.R
-import java.util.*
 
 abstract class BaseFragment : Fragment() {
   companion object {
 
-    val dataPointsY: ArrayList<Entry> = ArrayList()
+    val dataPointsY: CircularArray<Entry> = CircularArray()
 
-    val dataPointsZ: ArrayList<Entry> = ArrayList()
+    val dataPointsZ: CircularArray<Entry> = CircularArray()
 
-    val dataPointsX: ArrayList<Entry> = ArrayList()
+    val dataPointsX: CircularArray<Entry> = CircularArray()
 
     private val TAG = BaseFragment::class.java.simpleName
 
@@ -41,13 +41,21 @@ abstract class BaseFragment : Fragment() {
       val seriesYName = context.getString(R.string.tab_text_y)
       val seriesZName = context.getString(R.string.tab_text_z)
 
-      seriesX = LineDataSet(dataPointsX, seriesXName)
-      seriesY = LineDataSet(dataPointsY, seriesYName)
-      seriesZ = LineDataSet(dataPointsZ, seriesZName)
+      seriesX = LineDataSet(emptyList(), seriesXName)
+      seriesY = LineDataSet(emptyList(), seriesYName)
+      seriesZ = LineDataSet(emptyList(), seriesZName)
 
       seriesX.color = colorX
       seriesY.color = colorY
       seriesZ.color = colorZ
+    }
+
+    @Synchronized
+    fun <E> CircularArray<E>.toArrayList(): ArrayList<E> {
+      val size = this.size()
+      val array = ArrayList<E>()
+      (0 until size).mapTo(array) { this[it] }
+      return array
     }
   }
 }

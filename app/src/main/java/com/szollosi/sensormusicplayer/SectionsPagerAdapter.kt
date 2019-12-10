@@ -17,38 +17,38 @@ import com.szollosi.sensormusicplayer.fragments.FragmentZ
  */
 class SectionsPagerAdapter internal constructor(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-  // Sparse array to keep track of registered fragments in memory
-  private val registeredFragments = SparseArray<Fragment>()
+    private val titles = listOf("Page XYZ", "Page X", "Page Y", "Page Z")
 
-  // Register the fragment when the item is instantiated
-  override fun instantiateItem(container: ViewGroup, position: Int): Any {
-    val fragment = super.instantiateItem(container, position) as Fragment
-    registeredFragments.put(position, fragment)
-    return fragment
-  }
+    // Sparse array to keep track of registered fragments in memory
+    private val registeredFragments = SparseArray<Fragment>()
 
-  // Unregister when the item is inactive
-  override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-    registeredFragments.remove(position)
-    super.destroyItem(container, position, `object`)
-  }
+    // Register the fragment when the item is instantiated
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        val fragment = super.instantiateItem(container, position) as Fragment
+        registeredFragments.put(position, fragment)
+        return fragment
+    }
 
-  // Returns the fragment for the position (if instantiated)
-  fun getRegisteredFragment(position: Int): Fragment = registeredFragments.get(position)
+    // Unregister when the item is inactive
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        registeredFragments.remove(position)
+        super.destroyItem(container, position, `object`)
+    }
 
-  override fun getCount(): Int = Constants.NUMBER_OF_AVAILABLE_SCREENS.toInt()
+    // Returns the fragment for the position (if instantiated)
+    fun getRegisteredFragment(position: Int): Fragment = registeredFragments.get(position)
 
-  // getItem is called to instantiate the fragment for the given page.
-  override fun getItem(position: Int): Fragment = when (position) {
-    0 -> FragmentXYZ.newInstance(0, "Page XYZ")
-    1 -> FragmentX.newInstance(1, "Page # X")
-    2 -> FragmentY.newInstance(2, "Page # Y")
-    3 -> FragmentZ.newInstance(3, "Page # Z")
-    else -> FragmentXYZ.newInstance(0, "Page XYZ")
-  }
+    override fun getCount(): Int = Constants.NUMBER_OF_AVAILABLE_SCREENS.toInt()
+
+    // getItem is called to instantiate the fragment for the given page.
+    override fun getItem(position: Int): Fragment = when (position) {
+        0 -> FragmentXYZ.newInstance(0, titles[position])
+        1 -> FragmentX.newInstance(1, titles[position])
+        2 -> FragmentY.newInstance(2, titles[position])
+        3 -> FragmentZ.newInstance(3, titles[position])
+        else -> FragmentXYZ.newInstance(0, titles[0])
+    }
+
+    // Returns the page title for the top indicator
+    override fun getPageTitle(position: Int) = titles[position]
 }
-
-// Returns the page title for the top indicator
-//  override fun getPageTitle(position: Int): CharSequence? {
-//    return "Page $position"
-//  }

@@ -2,7 +2,7 @@ package com.szollosi.sensormusicplayer
 
 object Constants {
 
-  const val DELAY_REFRESH: Short = 100
+    const val DELAY_REFRESH: Short = 200
 
   const val MAX_DATA_POINTS = 40
 

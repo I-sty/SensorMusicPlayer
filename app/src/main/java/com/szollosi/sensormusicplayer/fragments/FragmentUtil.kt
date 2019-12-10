@@ -1,8 +1,8 @@
 package com.szollosi.sensormusicplayer.fragments
 
+import androidx.collection.CircularArray
 import com.github.mikephil.charting.data.Entry
 import com.szollosi.sensormusicplayer.Constants
-import kotlin.collections.ArrayList
 
 object FragmentUtil {
 
@@ -15,19 +15,19 @@ object FragmentUtil {
    * @param item The element to append.
    */
   @Synchronized
-  fun addItemToList(list: ArrayList<Entry>,
+  fun addItemToList(list: CircularArray<Entry>,
                     item: Entry) {
-    if (list.size >= Constants.MAX_DATA_POINTS) {
-      list.drop(1)
+    if (list.size() >= Constants.MAX_DATA_POINTS) {
+      list.popFirst()
     }
-    list.add(item)
+    list.addLast(item)
   }
 
-  fun getPeakWindow(list: List<Entry>): List<Entry> {
-    val size = list.size
-    return if (size == 0) {
-      ArrayList()
-    } else list.subList(0, size)
+  fun getPeakWindow(list: CircularArray<Entry>): List<Entry> {
+//    val size = list.size()
+//    return if (size == 0) {
+    return ArrayList()
+//    } else list.subList(0, size)
   }
 
 }

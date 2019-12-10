@@ -6,7 +6,6 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.LineData
 import com.szollosi.sensormusicplayer.Constants
@@ -21,9 +20,9 @@ class FragmentX : BaseFragment() {
   private val refreshGraph = object : Runnable {
 
     override fun run() {
-      synchronized(BaseFragment.dataPointsX) {
-        BaseFragment.seriesY.values = BaseFragment.dataPointsX
-        chart!!.data = LineData(BaseFragment.seriesX)
+      synchronized(dataPointsX) {
+        seriesY.values = dataPointsX.toArrayList()
+        chart!!.data = LineData(seriesX)
         chart!!.invalidate()
         mHandler!!.postDelayed(this, Constants.DELAY_REFRESH.toLong())
       }

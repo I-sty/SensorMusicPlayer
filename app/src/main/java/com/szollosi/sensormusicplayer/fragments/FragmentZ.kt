@@ -21,9 +21,9 @@ class FragmentZ : BaseFragment() {
   private val refreshGraph = object : Runnable {
 
     override fun run() {
-      synchronized(BaseFragment.dataPointsZ) {
-        BaseFragment.seriesY.values = BaseFragment.dataPointsZ
-        chart!!.data = LineData(BaseFragment.seriesZ)
+      synchronized(dataPointsZ) {
+        seriesY.values = dataPointsZ.toArrayList()
+        chart!!.data = LineData(seriesZ)
         chart!!.invalidate()
         mHandler!!.postDelayed(this, Constants.DELAY_REFRESH.toLong())
       }
