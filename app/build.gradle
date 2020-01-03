@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 29
@@ -30,8 +32,12 @@ dependencies {
 
     //testing
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$rootProject.ext.leakcanary"
-    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$rootProject.ext.leakcanary"
 
     //tools
     implementation "com.github.PhilJay:MPAndroidChart:$rootProject.ext.chart"
+    implementation "androidx.core:core-ktx:$rootProject.ext.ktx"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

@@ -1,15 +1,4 @@
-package com.szollosi.sensormusicplayer.fragments;
-
-import android.os.Bundle;
-import android.preference.PreferenceFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.szollosi.sensormusicplayer.R;
+package com.szollosi.sensormusicplayer.fragments
 
 //public class FragmentConfig extends PreferenceFragment {
 //
