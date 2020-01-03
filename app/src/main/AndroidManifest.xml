@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.kalosis.sensormusicplayer"
+<manifest package="com.szollosi.sensormusicplayer"
           xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-
     <application
-        android:name=".SensorApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,7 +12,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".MainActivity"
+            android:name="com.szollosi.sensormusicplayer.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
@@ -26,6 +23,8 @@
             </intent-filter>
         </activity>
 
+      <!--      <service-->
+      <!--          android:name="com.szollosi.sensormusicplayer.controller.PeakCalculator" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />-->
     </application>
 
 </manifest>
