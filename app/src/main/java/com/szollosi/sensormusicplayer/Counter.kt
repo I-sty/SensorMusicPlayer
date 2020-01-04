@@ -1,6 +1,6 @@
 package com.szollosi.sensormusicplayer
 
-class Counter {
+class MyCounter {
 
   @get:Synchronized
   var counter: Long = 0

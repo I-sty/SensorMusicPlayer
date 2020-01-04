@@ -3,17 +3,16 @@ package com.szollosi.sensormusicplayer.util
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
-
 import com.github.mikephil.charting.data.Entry
-import com.szollosi.sensormusicplayer.Constants
-import com.szollosi.sensormusicplayer.Counter
+import com.szollosi.sensormusicplayer.MyConstants
+import com.szollosi.sensormusicplayer.MyCounter
 import com.szollosi.sensormusicplayer.fragments.BaseFragment
-import com.szollosi.sensormusicplayer.fragments.FragmentUtil
+import com.szollosi.sensormusicplayer.fragments.MyFragmentUtil
 import kotlin.math.abs
 
 class SensorListener : SensorEventListener {
 
-    private val counter = Counter()
+    private val counter = MyCounter()
 
     private val gravity = FloatArray(3)
 
@@ -43,16 +42,16 @@ class SensorListener : SensorEventListener {
             val dataPointY = Entry(counter1.toFloat(), initYValue(y - gravity[1]))
             val dataPointZ = Entry(counter1.toFloat(), initYValue(z - gravity[2]))
 
-            FragmentUtil.addItemToList(BaseFragment.dataPointsX, dataPointX)
-            FragmentUtil.addItemToList(BaseFragment.dataPointsY, dataPointY)
-            FragmentUtil.addItemToList(BaseFragment.dataPointsZ, dataPointZ)
+            MyFragmentUtil.apply {
+                addItemToList(BaseFragment.dataPointsX, dataPointX)
+                addItemToList(BaseFragment.dataPointsY, dataPointY)
+                addItemToList(BaseFragment.dataPointsZ, dataPointZ)
+            }
 
             counter.increment()
         }
     }
 
-    private fun initYValue(v: Float): Float {
-        return if (abs(v) < Constants.THRESHOLD) 0f else v
-    }
+    private fun initYValue(v: Float): Float = if (abs(v) < MyConstants.THRESHOLD) 0f else v
 
 }

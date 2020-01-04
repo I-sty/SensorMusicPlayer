@@ -2,9 +2,9 @@ package com.szollosi.sensormusicplayer.fragments
 
 import androidx.collection.CircularArray
 import com.github.mikephil.charting.data.Entry
-import com.szollosi.sensormusicplayer.Constants
+import com.szollosi.sensormusicplayer.MyConstants
 
-object FragmentUtil {
+object MyFragmentUtil {
 
 
   /**
@@ -17,7 +17,7 @@ object FragmentUtil {
   @Synchronized
   fun addItemToList(list: CircularArray<Entry>,
                     item: Entry) {
-    if (list.size() >= Constants.MAX_DATA_POINTS) {
+      if (list.size() >= MyConstants.MAX_DATA_POINTS) {
       list.popFirst()
     }
     list.addLast(item)

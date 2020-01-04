@@ -31,4 +31,9 @@
   <string name="title_child_preference">Title child</string>
   <string name="summary_child_preference">Summary child</string>
     <string name="tab_text_config">Config</string>
+    <string name="activity_selector">Selector</string>
+    <string name="label_testing">Test it</string>
+    <string name="label_data_collection">Data collection</string>
+    <string name="label_to_right">to Right</string>
+    <string name="label_to_left">to Left</string>
 </resources>

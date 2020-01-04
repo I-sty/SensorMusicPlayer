@@ -1,6 +1,6 @@
 package com.szollosi.sensormusicplayer
 
-object Constants {
+object MyConstants {
 
     const val DELAY_REFRESH: Short = 200
 

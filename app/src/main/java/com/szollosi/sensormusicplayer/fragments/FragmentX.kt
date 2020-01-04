@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.LineData
-import com.szollosi.sensormusicplayer.Constants
+import com.szollosi.sensormusicplayer.MyConstants
 import com.szollosi.sensormusicplayer.R
 
 class FragmentX : BaseFragment() {
@@ -24,7 +24,7 @@ class FragmentX : BaseFragment() {
         seriesY.values = dataPointsX.toArrayList()
         chart!!.data = LineData(seriesX)
         chart!!.invalidate()
-        mHandler!!.postDelayed(this, Constants.DELAY_REFRESH.toLong())
+          mHandler!!.postDelayed(this, MyConstants.DELAY_REFRESH.toLong())
       }
     }
   }
@@ -43,7 +43,7 @@ class FragmentX : BaseFragment() {
   override fun onResume() {
     super.onResume()
     mHandler = Handler(Looper.myLooper()!!)
-    mHandler!!.postDelayed(refreshGraph, Constants.DELAY_REFRESH.toLong())
+      mHandler!!.postDelayed(refreshGraph, MyConstants.DELAY_REFRESH.toLong())
   }
 
   override fun onPause() {

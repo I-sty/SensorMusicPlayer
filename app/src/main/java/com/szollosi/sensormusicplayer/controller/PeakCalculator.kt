@@ -3,15 +3,15 @@ package com.szollosi.sensormusicplayer.controller
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.util.Log
-import com.szollosi.sensormusicplayer.Constants
+import com.szollosi.sensormusicplayer.MyConstants
 import com.szollosi.sensormusicplayer.fragments.BaseFragment
-import com.szollosi.sensormusicplayer.fragments.FragmentUtil
+import com.szollosi.sensormusicplayer.fragments.MyFragmentUtil
 
 class PeakCalculator : JobService() {
 
   override fun onStartJob(params: JobParameters): Boolean {
     Log.i(TAG, "[onStartJob]")
-    val list = FragmentUtil.getPeakWindow(BaseFragment.dataPointsZ)
+      val list = MyFragmentUtil.getPeakWindow(BaseFragment.dataPointsZ)
     if (list.isEmpty()) {
       jobFinished(params, true)
       return true
@@ -30,7 +30,7 @@ class PeakCalculator : JobService() {
 
     //check if the peak is higher then a threshold
     val peak = peakPoint.y.toDouble()
-    if (peak >= Constants.PEAK_THRESHOLD) {
+      if (peak >= MyConstants.PEAK_THRESHOLD) {
       Log.i(TAG, "[onStartJob] Peak found: $peakPoint")
     }
 

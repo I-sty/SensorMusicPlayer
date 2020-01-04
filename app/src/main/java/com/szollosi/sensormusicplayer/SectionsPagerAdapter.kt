@@ -38,7 +38,7 @@ class SectionsPagerAdapter internal constructor(fm: FragmentManager) : FragmentS
     // Returns the fragment for the position (if instantiated)
     fun getRegisteredFragment(position: Int): Fragment = registeredFragments.get(position)
 
-    override fun getCount(): Int = Constants.NUMBER_OF_AVAILABLE_SCREENS.toInt()
+    override fun getCount(): Int = MyConstants.NUMBER_OF_AVAILABLE_SCREENS.toInt()
 
     // getItem is called to instantiate the fragment for the given page.
     override fun getItem(position: Int): Fragment = when (position) {
