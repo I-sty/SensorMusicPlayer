@@ -29,11 +29,11 @@ local.properties
 # Android Studio
 .idea
 .gradle
-/*/local.properties
-/*/out
-/*/*/build
+/local.properties
+/out
+/build
 build
-/*/*/production
+/production
 *.iml
 *.iws
 *.ipr

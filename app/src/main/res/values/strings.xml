@@ -36,4 +36,6 @@
     <string name="label_data_collection">Data collection</string>
     <string name="label_to_right">to Right</string>
     <string name="label_to_left">to Left</string>
+    <string name="label_enter_your_username">Enter your username</string>
+    <string name="label_select_a_gesture">Select a gesture</string>
 </resources>
