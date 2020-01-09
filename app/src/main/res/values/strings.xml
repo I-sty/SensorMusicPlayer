@@ -38,4 +38,8 @@
     <string name="label_to_left">to Left</string>
     <string name="label_enter_your_username">Enter your username</string>
     <string name="label_select_a_gesture">Select a gesture</string>
+  <string name="label_start">Start</string>
+  <string name="label_press_start_button">Press the Start button to start recording\n Press again to stop it</string>
+  <string name="label_stop">Stop</string>
+  <string name="label_empty_numeric_field">0.0</string>
 </resources>
