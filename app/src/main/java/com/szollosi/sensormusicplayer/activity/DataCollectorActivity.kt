@@ -24,7 +24,6 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
-import kotlin.math.abs
 
 
 class DataCollectorActivity : AppCompatActivity(), SensorEventListener {
@@ -114,32 +113,36 @@ class DataCollectorActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.values == null) return
 
+        val currentXvalue = event.values[0]
+        val currentYvalue = event.values[1]
+        val currentZvalue = event.values[2]
+
         // clean current values
-        displayCleanValues()
+//        displayCleanValues()
         // display the current x,y,z accelerometer values
-        displayCurrentValues()
+        displayCurrentValues(currentXvalue, currentYvalue, currentZvalue)
         // display the max x,y,z accelerometer values
-        displayMaxValues()
+//        displayMaxValues()
 
-        // get the change of the x,y,z values of the accelerometer
-        deltaX = abs(lastX - event.values[0])
-        deltaY = abs(lastY - event.values[1])
-        deltaZ = abs(lastZ - event.values[2])
+//        // get the change of the x,y,z values of the accelerometer
+//        deltaX = abs(lastX - event.values[0])
+//        deltaY = abs(lastY - event.values[1])
+//        deltaZ = abs(lastZ - event.values[2])
+//
+//        lastX = event.values[0]
+//        lastY = event.values[1]
+//        lastZ = event.values[2]
 
-        lastX = event.values[0]
-        lastY = event.values[1]
-        lastZ = event.values[2]
-
-        // if the change is below 2, it is just plain noise
-        if (deltaX < INVALID_THRESHOLD)
-            deltaX = 0f
-        if (deltaY < INVALID_THRESHOLD)
-            deltaY = 0f
-        if (deltaZ < INVALID_THRESHOLD)
-            deltaZ = 0f
+//        // if the change is below 2, it is just plain noise
+//        if (deltaX < INVALID_THRESHOLD)
+//            deltaX = 0f
+//        if (deltaY < INVALID_THRESHOLD)
+//            deltaY = 0f
+//        if (deltaZ < INVALID_THRESHOLD)
+//            deltaZ = 0f
 
 
-        val entry = currentX?.text.toString() + "," + currentY?.text.toString() + "," + currentZ?.text.toString() + "\n"
+        val entry = "$currentXvalue,$currentYvalue,$currentZvalue\n"
 
         try {
             f.write(entry.toByteArray(Charsets.UTF_8))
@@ -148,35 +151,35 @@ class DataCollectorActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    private fun displayCleanValues() {
-        currentX?.text = "0.0"
-        currentY?.text = "0.0"
-        currentZ?.text = "0.0"
-    }
+//    private fun displayCleanValues() {
+//        currentX?.text = "0.0"
+//        currentY?.text = "0.0"
+//        currentZ?.text = "0.0"
+//    }
 
     // display the current x,y,z accelerometer values
-    private fun displayCurrentValues() {
-        currentX?.text = deltaX.toString()
-        currentY?.text = deltaY.toString()
-        currentZ?.text = deltaZ.toString()
+    private fun displayCurrentValues(x: Float, y: Float, z: Float) {
+        currentX?.text = x.toString()
+        currentY?.text = y.toString()
+        currentZ?.text = z.toString()
     }
 
-    // display the max x,y,z accelerometer values
-    private fun displayMaxValues() {
-        if (deltaX > deltaXMax) {
-            deltaXMax = deltaX
-            maxX?.text = deltaX.toString()
-        }
-        if (deltaY > deltaYMax) {
-            deltaYMax = deltaY
-            maxY?.text = deltaY.toString()
-        }
-
-        if (deltaZ > deltaZMax) {
-            deltaZMax = deltaZ
-            maxZ?.text = deltaZ.toString()
-        }
-    }
+//    // display the max x,y,z accelerometer values
+//    private fun displayMaxValues() {
+//        if (deltaX > deltaXMax) {
+//            deltaXMax = deltaX
+//            maxX?.text = deltaX.toString()
+//        }
+//        if (deltaY > deltaYMax) {
+//            deltaYMax = deltaY
+//            maxY?.text = deltaY.toString()
+//        }
+//
+//        if (deltaZ > deltaZMax) {
+//            deltaZMax = deltaZ
+//            maxZ?.text = deltaZ.toString()
+//        }
+//    }
 
     private fun checkPermissions() {
         val hasWriteContactsPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
