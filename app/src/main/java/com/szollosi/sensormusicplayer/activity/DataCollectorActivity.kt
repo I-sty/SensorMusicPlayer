@@ -20,7 +20,6 @@ import com.szollosi.sensormusicplayer.MyConstants
 import com.szollosi.sensormusicplayer.R
 import com.szollosi.sensormusicplayer.util.Gesture
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
@@ -214,7 +213,7 @@ class DataCollectorActivity : AppCompatActivity(), SensorEventListener {
             //start recording
             v.text = labelStop
 
-            openFile()
+            openFile(v.context)
             accelerometer?.let { acc ->
                 sensorManager?.registerListener(this@DataCollectorActivity, acc, SensorManager.SENSOR_DELAY_UI)
                 vibrateThreshold = acc.maximumRange / 3
@@ -238,16 +237,14 @@ class DataCollectorActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    private fun openFile() {
-        val sdCard = Environment.getExternalStorageDirectory()
-        val dir = File(sdCard.absolutePath + "/isti-example")
-        dir.mkdir()
-
-        val file = File(dir, "output_${Date().time}.csv")
-        try {
+    private fun openFile(context: Context) {
+        val state = Environment.getExternalStorageState()
+        if (state == Environment.MEDIA_MOUNTED) {
+            val dir = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/isti-example")
+            dir.mkdir()
+            val file = File(dir, "output_${Date().time}.csv")
             f = FileOutputStream(file, true)
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
         }
+
     }
 }
